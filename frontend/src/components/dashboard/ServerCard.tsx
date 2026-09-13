@@ -13,7 +13,8 @@ import {
   Database,
   Layers,
   RefreshCw,
-  X
+  X,
+  Monitor
 } from 'lucide-react';
 import { ServerProfile, ConnectionTestResult, ServerStatusInfo } from '../../types';
 import { api } from '../../api/client';
@@ -31,6 +32,7 @@ interface ServerCardProps {
   onEdit: (server: ServerProfile) => void;
   onDelete: (server: ServerProfile) => void;
   onRemoveTag?: (serverId: number, tag: string) => void;
+  onOpenDesktop: (server: ServerProfile) => void;
 }
 
 export const ServerCard: React.FC<ServerCardProps> = ({
@@ -45,7 +47,8 @@ export const ServerCard: React.FC<ServerCardProps> = ({
   onOpenDatabase,
   onEdit,
   onDelete,
-  onRemoveTag
+  onRemoveTag,
+  onOpenDesktop
 }) => {
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<ConnectionTestResult | null>(null);
@@ -202,6 +205,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({
                 <span>Connect</span>
               </>
             )}
+          </button>
+          
+          <button className="btn btn-outline btn-xs" title="Remote Desktop GUI" onClick={() => onOpenDesktop(server)}>
+            <Monitor size={13} color="var(--accent-purple)" />
           </button>
 
           <div style={{ position: 'relative' }}>
@@ -439,6 +446,15 @@ export const ServerCard: React.FC<ServerCardProps> = ({
           >
             <Activity size={14} color="var(--accent-indigo)" />
             <span>Stats</span>
+          </button>
+          
+          <button
+            className="btn btn-outline btn-sm"
+            title="Remote Desktop GUI"
+            onClick={() => onOpenDesktop(server)}
+          >
+            <Monitor size={14} color="var(--accent-purple)" />
+            <span>GUI</span>
           </button>
         </div>
 

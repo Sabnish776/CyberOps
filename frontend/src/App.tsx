@@ -9,6 +9,8 @@ import { FileManagerModal } from './components/sftp/FileManagerModal';
 import { MonitoringModal } from './components/monitoring/MonitoringModal';
 import { TunnelManagerModal } from './components/tunnels/TunnelManagerModal';
 import { DatabaseConsoleModal } from './components/database/DatabaseConsoleModal';
+import { SecurityChallengeModal } from './components/common/SecurityChallengeModal';
+import { RemoteDesktopModal } from './components/desktop/RemoteDesktopModal';
 import { ServiceManagerModal } from './components/services/ServiceManagerModal';
 import { BroadcastWorkspace } from './components/broadcast/BroadcastWorkspace';
 import { AuthModal } from './components/auth/AuthModal';
@@ -59,6 +61,7 @@ export const App: React.FC = () => {
   const [databaseServer, setDatabaseServer] = useState<ServerProfile | null>(null);
   const [databasePreset, setDatabasePreset] = useState<{ type: 'MYSQL' | 'POSTGRES' | 'REDIS'; port?: number } | null>(null);
   const [serviceServer, setServiceServer] = useState<ServerProfile | null>(null);
+  const [desktopServer, setDesktopServer] = useState<ServerProfile | null>(null);
 
   // Cyber Aesthetics & Shortcuts
   const [scanlinesEnabled, setScanlinesEnabled] = useState<boolean>(() => {
@@ -620,6 +623,7 @@ export const App: React.FC = () => {
                     onOpenMonitoring={(s) => setMonitorServer(s)}
                     onOpenTunnels={(s) => setTunnelServer(s)}
                     onOpenDatabase={(s) => setDatabaseServer(s)}
+                    onOpenDesktop={(s) => setDesktopServer(s)}
                     onEdit={(s) => { setEditServer(s); setServerModalOpen(true); }}
                     onDelete={handleDeleteServer}
                     onRemoveTag={handleRemoveTagFromServer}
@@ -712,6 +716,12 @@ export const App: React.FC = () => {
         onConnectWithCommand={handleConnectWithCommand}
         onOpenTunnel={handleOpenTunnelFromService}
         onOpenDatabaseConsole={handleOpenDatabaseFromService}
+      />
+
+      <RemoteDesktopModal
+        server={desktopServer}
+        isOpen={!!desktopServer}
+        onClose={() => setDesktopServer(null)}
       />
 
       <CommandPalette

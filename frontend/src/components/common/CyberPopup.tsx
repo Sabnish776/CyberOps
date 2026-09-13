@@ -31,6 +31,15 @@ export const CyberPopup: React.FC<CyberPopupProps> = ({
   onCancel
 }) => {
   const confirmBtnRef = useRef<HTMLButtonElement>(null);
+  
+  // Use refs to avoid stale closures in the event listener without triggering re-renders
+  const onConfirmRef = useRef(onConfirm);
+  const onCancelRef = useRef(onCancel);
+
+  useEffect(() => {
+    onConfirmRef.current = onConfirm;
+    onCancelRef.current = onCancel;
+  }, [onConfirm, onCancel]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -38,10 +47,10 @@ export const CyberPopup: React.FC<CyberPopupProps> = ({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && !loading) {
         e.preventDefault();
-        onCancel();
+        onCancelRef.current();
       } else if (e.key === 'Enter' && !loading) {
         e.preventDefault();
-        onConfirm();
+        onConfirmRef.current();
       }
     };
 
@@ -53,7 +62,7 @@ export const CyberPopup: React.FC<CyberPopupProps> = ({
       window.removeEventListener('keydown', handleKeyDown);
       clearTimeout(timer);
     };
-  }, [isOpen, loading, onConfirm, onCancel]);
+  }, [isOpen, loading]);
 
   if (!isOpen) return null;
 
