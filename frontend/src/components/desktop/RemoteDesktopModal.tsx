@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { X, Monitor, AlertCircle, RefreshCw } from 'lucide-react';
+import { X, Monitor, AlertCircle, RefreshCw, Maximize } from 'lucide-react';
 import { ServerProfile } from '../../types';
 import { api } from '../../api/client';
 import { authStorage } from '../../api/client';
@@ -26,6 +26,28 @@ export const RemoteDesktopModal: React.FC<RemoteDesktopModalProps> = ({
   const [isSetupGuideOpen, setIsSetupGuideOpen] = useState(false);
   const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
   const [vncPassword, setVncPassword] = useState('');
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      if (modalRef.current?.requestFullscreen) {
+        modalRef.current.requestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  };
 
   useEffect(() => {
     if (isOpen && server) {
@@ -106,23 +128,36 @@ export const RemoteDesktopModal: React.FC<RemoteDesktopModalProps> = ({
   return (
     <div className="modal-overlay" onClick={onClose} style={{ zIndex: 100 }}>
       <div 
+        ref={modalRef}
         className="modal-content large" 
         onClick={(e) => e.stopPropagation()}
         style={{ 
-          width: '95vw', 
-          height: '95vh', 
-          maxWidth: '1920px',
+          width: isFullscreen ? '100vw' : '95vw', 
+          height: isFullscreen ? '100vh' : '95vh', 
+          maxWidth: isFullscreen ? '100vw' : '1920px',
           display: 'flex',
           flexDirection: 'column',
-          padding: 0
+          padding: 0,
+          borderRadius: isFullscreen ? 0 : undefined,
+          backgroundColor: 'var(--bg-secondary)'
         }}
       >
-        <div className="modal-header" style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border-subtle)' }}>
+        <div 
+          className="modal-header" 
+          style={{ 
+            padding: '1rem 1.5rem', 
+            borderBottom: '1px solid var(--border-subtle)',
+            display: isFullscreen ? 'none' : 'flex'
+          }}
+        >
           <h2>
             <Monitor size={20} color="var(--accent-purple)" />
             <span>Remote Desktop: {server.name}</span>
           </h2>
           <div style={{ display: 'flex', gap: '10px' }}>
+            <button className="btn btn-outline btn-icon" onClick={toggleFullscreen} title="Fullscreen">
+              <Maximize size={18} />
+            </button>
             <button className="btn btn-outline btn-icon" onClick={connectVnc} title="Reconnect">
               <RefreshCw size={18} className={connecting ? 'spinning' : ''} />
             </button>
@@ -137,7 +172,7 @@ export const RemoteDesktopModal: React.FC<RemoteDesktopModalProps> = ({
           padding: '10px 1.5rem', 
           background: 'rgba(239, 68, 68, 0.1)', 
           borderBottom: '1px solid rgba(239, 68, 68, 0.2)',
-          display: 'flex',
+          display: isFullscreen ? 'none' : 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: '10px'
