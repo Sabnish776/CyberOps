@@ -99,18 +99,30 @@ Connect to remote servers, cloud VPS instances, local machines, or Docker contai
 * **Full Hierarchy Browsing**: Browse directories, inspect file permissions, file sizes, and modification dates.
 * **File Operations**: Streamed upload, download, file deletion, rename, and directory creation.
 
-### 8. Embedded SQLite Database
+### 8. Full Linux Remote Desktop (VNC over SSH)
+* **Zero-Config Streaming**: Directly connects to native desktop environments (XFCE, GNOME) rendering them seamlessly in your browser using NoVNC and an encrypted SSH websocket tunnel. No VPN required.
+* **Dynamic Display Scanner**: Automatically hunts and binds to the correct active VNC displays (Ports 5900-5903), bypassing ghost ports and OS-reserved displays.
+* **Impostor Daemon Filtering**: Engineered with a 3-byte RFB protocol sniffer to instantly reject fake ports (like Android's Termux display daemons) and only proxy real VNC servers.
+* **Cross-Platform Setup Guide**: Includes exact copy-paste scripts to securely install and launch headless VNC environments on Ubuntu, Windows, macOS, and Termux (Android).
+* **Immersive Mode**: A 1-click Fullscreen toggle that strips away all UI chrome for a 100% native remote desktop experience.
+
+### 9. Production Docker Containerization
+* **Isolated Stacks**: Fully decoupled Java 21 backend and Node 20 frontend environments.
+* **Nginx Reverse Proxy**: Production-grade Nginx configuration serving compiled React assets while seamlessly proxying HTTP (`/api`) and WebSocket (`/ws`) traffic to the Spring Boot backend.
+* **Orchestration**: A unified `docker-compose.yml` to spin up the entire Devkit with a single `docker compose up -d` command.
+
+### 10. Embedded SQLite Database
 * **Zero External Dependencies**: Stores all profiles, encrypted credentials, and tunnels in `backend/sshworkspace.db`. No PostgreSQL container or external database server required. Cold start in ~4 seconds.
 
-### 9. Security & Credential Vault
+### 11. Security & Credential Vault
 * **AES-256-GCM Encryption**: Passwords and private keys are encrypted at rest using AES-256 in Galois/Counter Mode with 128-bit authentication tags.
 * **Zero Exposure**: Credentials and private keys are never exposed in REST API responses or browser local storage.
 * **Audit Logging**: Automatic event recording with secret and password redaction.
 
-### 10. Cyber-Ops Design System
+### 12. Cyber-Ops Design System
 * **Modern Aesthetics**: Deep cyber-dark palette (`#080d14`), emerald/cyan/amber neon accents, subtle glassmorphism, glowing borders, CRT scanline toggle, real-time Telemetry HUD, and a quick keyboard command palette (`Ctrl+K`).
 
-### 11. Multi-Exec / Cluster Broadcast Shell (DevOps Superpower)
+### 13. Multi-Exec / Cluster Broadcast Shell (DevOps Superpower)
 * **Parallel Fleet Execution**: Dispatch shell commands simultaneously across multiple remote or local servers with non-blocking concurrency via `CompletableFuture` and SSH `ChannelExec`.
 * **Scope & Target Filtering**: Filter target machines with quick chips by Server Group (`Dev`, `Aws`), Tags (`#tailscale`, `#production`), or individual toggle checkboxes.
 * **DevOps Presets**: Built-in 1-click execution templates:
@@ -127,7 +139,7 @@ Connect to remote servers, cloud VPS instances, local machines, or Docker contai
 * **1-Click Shell Jump (`Open Shell`)**: Click directly on any host tile to transition immediately into a dedicated, interactive PTY terminal session.
 * **Report Export**: One-click download of complete multi-server execution runs in formatted Markdown (`.md`).
 
-### 12. 3-Tier Destructive Command Safety & Password Re-Authentication
+### 14. 3-Tier Destructive Command Safety & Password Re-Authentication
 To prevent accidental cluster disasters or unauthorized tampering if your computer is accessed, commands pass through a 3-tier defense engine before execution:
 
 * **Tier 1: Intelligent Pattern Inspector (Client & Server)**
