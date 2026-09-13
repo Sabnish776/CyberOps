@@ -228,7 +228,12 @@ public class ServiceManagerService {
                     if (osType == RemoteOsType.WINDOWS) {
                         remoteCmd = String.format("powershell -NoProfile -NonInteractive -Command \"Stop-Process -Id %s -Force\"", safeServiceName);
                     } else {
-                        remoteCmd = String.format("(kill %s || sudo kill %s) 2>&1", safeServiceName, safeServiceName);
+                        if (request.getSudoPassword() != null && !request.getSudoPassword().isBlank()) {
+                            String pwd = request.getSudoPassword().replace("'", "'\\''");
+                            remoteCmd = String.format("(kill %s || echo '%s' | sudo -S kill %s) 2>&1", safeServiceName, pwd, safeServiceName);
+                        } else {
+                            remoteCmd = String.format("(kill %s || sudo kill %s) 2>&1", safeServiceName, safeServiceName);
+                        }
                     }
                 } else {
                     return ServiceActionResponseDto.builder()
@@ -238,12 +243,24 @@ public class ServiceManagerService {
                             .build();
                 }
             } else if ("OPENRC".equals(source)) {
-                remoteCmd = String.format("(sudo rc-service %s %s || rc-service %s %s) 2>&1",
-                        safeServiceName, actionLower, safeServiceName, actionLower);
+                if (request.getSudoPassword() != null && !request.getSudoPassword().isBlank()) {
+                    String pwd = request.getSudoPassword().replace("'", "'\\''");
+                    remoteCmd = String.format("(echo '%s' | sudo -S rc-service %s %s || rc-service %s %s) 2>&1",
+                            pwd, safeServiceName, actionLower, safeServiceName, actionLower);
+                } else {
+                    remoteCmd = String.format("(sudo rc-service %s %s || rc-service %s %s) 2>&1",
+                            safeServiceName, actionLower, safeServiceName, actionLower);
+                }
             } else {
                 // Default to systemctl with service fallback
-                remoteCmd = String.format("(sudo systemctl %s %s || systemctl %s %s || sudo service %s %s) 2>&1",
-                        actionLower, safeServiceName, actionLower, safeServiceName, safeServiceName, actionLower);
+                if (request.getSudoPassword() != null && !request.getSudoPassword().isBlank()) {
+                    String pwd = request.getSudoPassword().replace("'", "'\\''");
+                    remoteCmd = String.format("(echo '%s' | sudo -S systemctl %s %s || systemctl %s %s || echo '%s' | sudo -S service %s %s) 2>&1",
+                            pwd, actionLower, safeServiceName, actionLower, safeServiceName, pwd, safeServiceName, actionLower);
+                } else {
+                    remoteCmd = String.format("(sudo systemctl %s %s || systemctl %s %s || sudo service %s %s) 2>&1",
+                            actionLower, safeServiceName, actionLower, safeServiceName, safeServiceName, actionLower);
+                }
             }
 
             String output = executeRemoteCommand(session, remoteCmd, 15);

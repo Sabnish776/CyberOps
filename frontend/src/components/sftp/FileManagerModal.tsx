@@ -242,18 +242,29 @@ export const FileManagerModal: React.FC<FileManagerModalProps> = ({
           </button>
 
           <div className="sftp-breadcrumb" style={{ flex: 1 }}>
-            {currentPath.split('/').map((seg, idx, arr) => (
+            <span
+              className="breadcrumb-segment"
+              onClick={() => loadDirectory('/')}
+            >
+              root
+            </span>
+            {currentPath.split('/').filter(Boolean).map((seg, idx, arr) => (
               <React.Fragment key={idx}>
+                <span style={{ color: 'var(--text-muted)' }}>/</span>
                 <span
                   className="breadcrumb-segment"
                   onClick={() => {
-                    const target = arr.slice(0, idx + 1).join('/') || '/';
+                    let target;
+                    if (/^[a-zA-Z]:$/.test(arr[0])) {
+                      target = arr.slice(0, idx + 1).join('/') + (idx === 0 ? '/' : '');
+                    } else {
+                      target = '/' + arr.slice(0, idx + 1).join('/');
+                    }
                     loadDirectory(target);
                   }}
                 >
-                  {seg || '/'}
+                  {seg}
                 </span>
-                {idx < arr.length - 1 && <span style={{ color: 'var(--text-muted)' }}>/</span>}
               </React.Fragment>
             ))}
           </div>

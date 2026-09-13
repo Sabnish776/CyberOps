@@ -46,6 +46,7 @@ public class ServiceDtos {
         private String action; // START, STOP, RESTART, RELOAD
 
         private String source; // SYSTEMD, OPENRC, DOCKER
+        private String sudoPassword;
     }
 
     @Getter

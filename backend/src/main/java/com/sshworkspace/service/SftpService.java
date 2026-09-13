@@ -158,9 +158,9 @@ public class SftpService {
         if (path == null || path.isBlank()) return "";
         if (path.contains("\0")) throw new IllegalArgumentException("Invalid path: contains null character");
         
-        // Handle Windows drive paths (e.g. C: or C:\...) directly to avoid Paths.get() throwing on Linux
-        if (path.matches("^[a-zA-Z]:.*")) {
-            String normalized = path.replace('\\', '/');
+        // Handle Windows drive paths (e.g. C:, /C:, /C:\...) directly to avoid Paths.get() throwing on Linux
+        if (path.matches("^/?\\s*[a-zA-Z]:.*")) {
+            String normalized = path.replaceFirst("^/?\\s*", "").replace('\\', '/');
             if (normalized.matches("^[a-zA-Z]:$")) {
                 normalized += "/";
             }

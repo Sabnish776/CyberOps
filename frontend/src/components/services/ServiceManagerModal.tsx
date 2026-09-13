@@ -54,6 +54,7 @@ export const ServiceManagerModal: React.FC<ServiceManagerModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<'ALL' | 'DATABASE' | 'WEB' | 'CONTAINER' | 'SYSTEM' | 'PORT'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+  const [sudoPassword, setSudoPassword] = useState('');
 
   // Action status state
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
@@ -125,7 +126,8 @@ export const ServiceManagerModal: React.FC<ServiceManagerModalProps> = ({
         serviceId: service.id,
         serviceName: service.name,
         action,
-        source: service.source
+        source: service.source,
+        sudoPassword
       });
 
       setActionFeedback({
@@ -459,27 +461,50 @@ export const ServiceManagerModal: React.FC<ServiceManagerModalProps> = ({
             </button>
           </div>
 
-          {/* Search Box */}
-          <div style={{ position: 'relative', minWidth: '220px' }}>
-            <Search
-              size={14}
-              color="var(--text-muted)"
-              style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }}
-            />
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Search service, port, PID..."
-              style={{
-                paddingLeft: '32px',
-                paddingTop: '0.35rem',
-                paddingBottom: '0.35rem',
-                fontSize: '0.8rem',
-                borderRadius: '6px'
-              }}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+          {/* Search Box & Sudo */}
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ position: 'relative', minWidth: '180px' }}>
+              <Shield
+                size={14}
+                color="var(--text-muted)"
+                style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }}
+              />
+              <input
+                type="password"
+                className="form-control"
+                placeholder="Sudo Password (Optional)"
+                style={{
+                  paddingLeft: '32px',
+                  paddingTop: '0.35rem',
+                  paddingBottom: '0.35rem',
+                  fontSize: '0.8rem',
+                  borderRadius: '6px'
+                }}
+                value={sudoPassword}
+                onChange={(e) => setSudoPassword(e.target.value)}
+              />
+            </div>
+            <div style={{ position: 'relative', minWidth: '220px' }}>
+              <Search
+                size={14}
+                color="var(--text-muted)"
+                style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }}
+              />
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search service, port, PID..."
+                style={{
+                  paddingLeft: '32px',
+                  paddingTop: '0.35rem',
+                  paddingBottom: '0.35rem',
+                  fontSize: '0.8rem',
+                  borderRadius: '6px'
+                }}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
           </div>
         </div>
 

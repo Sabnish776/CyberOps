@@ -149,6 +149,7 @@ export interface ServiceActionInput {
   serviceName: string;
   action: 'START' | 'STOP' | 'RESTART' | 'RELOAD';
   source?: string;
+  sudoPassword?: string;
 }
 
 export interface ServiceActionOutput {
