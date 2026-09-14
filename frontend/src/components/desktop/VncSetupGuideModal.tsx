@@ -152,16 +152,32 @@ vncserver -localhost :1`}
           {activeTab === 'windows' && (
             <div className="setup-guide-content">
               <h3>Windows Desktop</h3>
-              <p>Windows has a full GUI by default, but we need to install a VNC Server to securely tunnel it through our SSH connection.</p>
+              <p>Windows has a full GUI by default, but we need to install a VNC Server to securely tunnel it through our SSH connection. Run this script in an <strong>Administrator PowerShell</strong> session on your Windows server to automatically install and configure TightVNC:</p>
               
-              <ol style={{ marginLeft: '1.5rem', marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-                <li>Download and install <strong>UltraVNC Server</strong> from the official website.</li>
-                <li>Launch the UltraVNC Server configuration panel.</li>
-                <li>In the <strong>Ports</strong> section, ensure it is set to <strong>Main: 5900</strong>.</li>
-                <li>In the <strong>Security</strong> section, check the box for <strong>"Allow Loopback Connections"</strong> (This is required since our Devkit connects via an internal SSH tunnel).</li>
-                <li>Set the connection settings to <strong>No Password</strong> or check "Require No Password" (since SSH secures the connection anyway).</li>
-                <li>Apply settings and ensure the UltraVNC server is running in your system tray.</li>
-              </ol>
+              <pre className="code-block">
+{`# 1. Download the TightVNC Installer
+Invoke-WebRequest -Uri "https://www.tightvnc.com/download/2.8.81/tightvnc-2.8.81-gpl-setup-64bit.msi" -OutFile "tightvnc.msi"
+
+# 2. Silently install it AND WAIT for it to finish
+Start-Process -FilePath "msiexec.exe" -ArgumentList "/i tightvnc.msi /quiet /norestart ADDLOCAL=Server SERVER_REGISTER_AS_SERVICE=1 SERVER_ADD_FIREWALL_EXCEPTION=1" -Wait -NoNewWindow
+
+# 3. Create the registry keys if they don't exist, then set the values
+if (-not (Test-Path "HKLM:\\Software\\TightVNC\\Server")) {
+    New-Item -Path "HKLM:\\Software\\TightVNC\\Server" -Force
+}
+
+# Allow Loopback connections (Crucial for Devkit SSH Tunnel)
+New-ItemProperty -Path "HKLM:\\Software\\TightVNC\\Server" -Name "AllowLoopback" -Value 1 -PropertyType DWord -Force
+
+# Disable VNC Password (Secure since the SSH connection itself acts as the authentication layer)
+New-ItemProperty -Path "HKLM:\\Software\\TightVNC\\Server" -Name "UseVncAuthentication" -Value 0 -PropertyType DWord -Force
+
+# 4. Restart the service to apply changes
+Restart-Service "tvnserver"
+
+# 5. Cleanup the installer
+Remove-Item "tightvnc.msi"`}
+              </pre>
             </div>
           )}
 

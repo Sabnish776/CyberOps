@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { X, Monitor, AlertCircle, RefreshCw, Maximize } from 'lucide-react';
+import { X, Monitor, AlertCircle, RefreshCw, Maximize, Keyboard } from 'lucide-react';
 import { ServerProfile } from '../../types';
 import { api } from '../../api/client';
 import { authStorage } from '../../api/client';
@@ -67,6 +67,12 @@ export const RemoteDesktopModal: React.FC<RemoteDesktopModalProps> = ({
         rfbRef.current.disconnect();
       } catch (e) {}
       rfbRef.current = null;
+    }
+  };
+
+  const handleSendCtrlAltDel = () => {
+    if (rfbRef.current) {
+      rfbRef.current.sendCtrlAltDel();
     }
   };
 
@@ -155,6 +161,9 @@ export const RemoteDesktopModal: React.FC<RemoteDesktopModalProps> = ({
             <span>Remote Desktop: {server.name}</span>
           </h2>
           <div style={{ display: 'flex', gap: '10px' }}>
+            <button className="btn btn-outline btn-icon" onClick={handleSendCtrlAltDel} title="Send Ctrl+Alt+Del">
+              <Keyboard size={18} />
+            </button>
             <button className="btn btn-outline btn-icon" onClick={toggleFullscreen} title="Fullscreen">
               <Maximize size={18} />
             </button>
