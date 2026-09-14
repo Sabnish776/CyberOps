@@ -58,7 +58,8 @@ public class SftpController {
                              @RequestParam String path,
                              HttpServletResponse response) throws Exception {
         ServerProfile server = getServer(serverId, principal.getId());
-        String filename = Paths.get(path).getFileName().toString();
+        String[] parts = path.split("[/\\\\]");
+        String filename = parts.length > 0 ? parts[parts.length - 1] : "downloaded_file";
 
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"");

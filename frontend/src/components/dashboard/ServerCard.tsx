@@ -208,7 +208,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({
           </button>
           
           <button className="btn btn-outline btn-xs" title="Remote Desktop GUI" onClick={() => onOpenDesktop(server)}>
-            <Monitor size={13} color="var(--accent-purple)" />
+            <Monitor size={13} color="var(--accent-indigo)" />
           </button>
 
           <div style={{ position: 'relative' }}>
@@ -453,7 +453,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({
             title="Remote Desktop GUI"
             onClick={() => onOpenDesktop(server)}
           >
-            <Monitor size={14} color="var(--accent-purple)" />
+            <Monitor size={14} color="var(--accent-indigo)" />
             <span>GUI</span>
           </button>
         </div>
