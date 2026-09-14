@@ -58,10 +58,12 @@ export const TerminalView: React.FC<TerminalViewProps> = ({
     onStatusChange('CONNECTING');
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    // Connect directly to backend port 8080 in dev mode to bypass Node proxy latency
-    const host = window.location.port === '5173'
-      ? `${window.location.hostname}:8080`
-      : window.location.host;
+    let host = window.location.host;
+    const meta = import.meta as any;
+    if (meta.env && meta.env.VITE_API_URL) {
+      const apiUrl = new URL(meta.env.VITE_API_URL);
+      host = apiUrl.host;
+    }
     const wsUrl = `${protocol}//${host}/ws/terminal/${tab.id}`;
     const ws = new WebSocket(wsUrl);
     socketRef.current = ws;
