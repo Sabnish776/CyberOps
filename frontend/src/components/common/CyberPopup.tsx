@@ -13,6 +13,7 @@ export interface CyberPopupProps {
   cancelText?: string;
   isAlert?: boolean;
   loading?: boolean;
+  loadingText?: string;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -27,6 +28,7 @@ export const CyberPopup: React.FC<CyberPopupProps> = ({
   cancelText = 'Cancel',
   isAlert = false,
   loading = false,
+  loadingText = 'Processing...',
   onConfirm,
   onCancel
 }) => {
@@ -205,7 +207,7 @@ export const CyberPopup: React.FC<CyberPopupProps> = ({
             disabled={loading}
           >
             {loading ? (
-              <span>Processing...</span>
+              <span>{loadingText}</span>
             ) : (
               <>
                 <span>{confirmText || vStyles.defaultConfirmText}</span>

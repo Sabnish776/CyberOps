@@ -13,6 +13,7 @@ import { SecurityChallengeModal } from './components/common/SecurityChallengeMod
 import { RemoteDesktopModal } from './components/desktop/RemoteDesktopModal';
 import { ServiceManagerModal } from './components/services/ServiceManagerModal';
 import { BroadcastWorkspace } from './components/broadcast/BroadcastWorkspace';
+import { TunnelMatrixWorkspace } from './components/network/TunnelMatrixWorkspace';
 import { AuthModal } from './components/auth/AuthModal';
 import { api, authStorage } from './api/client';
 import { User, ServerProfile, TerminalTabItem, ServerCreateInput, ServerStatusInfo } from './types';
@@ -42,7 +43,7 @@ export const App: React.FC = () => {
   };
 
   // Filtering & View state
-  const [activeView, setActiveView] = useState<'dashboard' | 'terminal' | 'broadcast'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'terminal' | 'broadcast' | 'network'>('dashboard');
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -150,6 +151,8 @@ export const App: React.FC = () => {
       });
       fetchServers();
       fetchTunnelsCount();
+      const tunnelInterval = setInterval(fetchTunnelsCount, 5000);
+      return () => clearInterval(tunnelInterval);
     }
   }, [user]);
 
@@ -669,6 +672,20 @@ export const App: React.FC = () => {
               onTabStatusChange={handleTabStatusChange}
             />
           </div>
+          {/* Tunnel Matrix View */}
+          <div
+            style={{
+              display: activeView === 'network' ? 'flex' : 'none',
+              flex: 1,
+              flexDirection: 'column',
+              height: '100%',
+              width: '100%',
+              overflow: 'hidden'
+            }}
+          >
+            <TunnelMatrixWorkspace servers={servers} isVisible={activeView === 'network'} />
+          </div>
+
         </main>
       </div>
 

@@ -38,6 +38,14 @@ public class TunnelController {
     public ResponseEntity<TunnelResponse> createTunnel(@AuthenticationPrincipal UserPrincipal principal,
                                                        @PathVariable Long serverId,
                                                        @Valid @RequestBody TunnelCreateRequest request) {
+        // Prevent duplicate local port allocation
+        boolean portInUse = tunnelRepository.findByUserId(principal.getId()).stream()
+                .anyMatch(t -> t.getLocalPort() == request.getLocalPort());
+                
+        if (portInUse) {
+            throw new IllegalArgumentException("Local port " + request.getLocalPort() + " is already assigned to another tunnel.");
+        }
+
         ServiceTunnel tunnel = ServiceTunnel.builder()
                 .userId(principal.getId())
                 .serverId(serverId)

@@ -1,0 +1,53 @@
+/* ===== Tunnel Matrix Canvas Styles ===== */
+
+/* Animated dashes flowing along tunnel edges */
+.animated-cyber-edge {
+  stroke-dasharray: 8 8;
+  animation: dashdraw 1s linear infinite;
+  pointer-events: auto !important;
+  cursor: pointer;
+}
+
+@keyframes dashdraw {
+  from { stroke-dashoffset: 16; }
+  to   { stroke-dashoffset: 0; }
+}
+
+/* ===== Canvas Background ===== */
+/* Grid + radial glow that matches the app's dark cyberpunk aesthetic */
+.tunnel-matrix-canvas .react-flow__background {
+  opacity: 1 !important;
+}
+
+.tunnel-matrix-canvas .react-flow__pane {
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 50%,
+    rgba(0, 240, 255, 0.04) 0%,
+    rgba(2, 6, 23, 0)       60%
+  ) !important;
+}
+
+/* ===== Controls ===== */
+.tunnel-matrix-canvas .react-flow__controls {
+  bottom: 20px !important;
+  right: 20px !important;
+  left: auto !important;
+}
+
+.tunnel-matrix-canvas .react-flow__controls button {
+  background: rgba(15, 23, 42, 0.9) !important;
+  border: 1px solid var(--accent-cyan) !important;
+  color: var(--accent-cyan) !important;
+  fill: var(--accent-cyan) !important;
+}
+
+.tunnel-matrix-canvas .react-flow__controls button:hover {
+  background: var(--accent-cyan) !important;
+  color: #000 !important;
+  fill: #000 !important;
+}
+
+/* ===== Edge interaction zone ===== */
+.react-flow__edge-interaction {
+  stroke-width: 20px !important;
+}

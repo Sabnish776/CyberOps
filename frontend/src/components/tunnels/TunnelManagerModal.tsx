@@ -59,11 +59,11 @@ export const TunnelManagerModal: React.FC<TunnelManagerModalProps> = ({
 
   // Add form state
   const [showForm, setShowForm] = useState(false);
-  const [name, setName] = useState('MySQL Service');
-  const [serviceType, setServiceType] = useState<string>('MYSQL');
-  const [localPort, setLocalPort] = useState(3306);
+  const [name, setName] = useState('');
+  const [serviceType, setServiceType] = useState<string>('CUSTOM');
+  const [localPort, setLocalPort] = useState<number | ''>('');
   const [remoteHost, setRemoteHost] = useState('127.0.0.1');
-  const [remotePort, setRemotePort] = useState(3306);
+  const [remotePort, setRemotePort] = useState<number | ''>('');
   const [autoStart, setAutoStart] = useState(true);
 
   const loadTunnels = async () => {
@@ -318,26 +318,22 @@ export const TunnelManagerModal: React.FC<TunnelManagerModalProps> = ({
                 <div className="form-group">
                   <label>LOCAL PORT (ON YOUR MACHINE)</label>
                   <input
-                    type="number"
+                    type="text"
                     className="form-control"
                     required
-                    min={1024}
-                    max={65535}
                     value={localPort}
-                    onChange={(e) => setLocalPort(parseInt(e.target.value) || 0)}
+                    onChange={(e) => setLocalPort(parseInt(e.target.value) || '')}
                   />
                 </div>
 
                 <div className="form-group">
                   <label>REMOTE DESTINATION PORT</label>
                   <input
-                    type="number"
+                    type="text"
                     className="form-control"
                     required
-                    min={1}
-                    max={65535}
                     value={remotePort}
-                    onChange={(e) => setRemotePort(parseInt(e.target.value) || 0)}
+                    onChange={(e) => setRemotePort(parseInt(e.target.value) || '')}
                   />
                 </div>
               </div>
