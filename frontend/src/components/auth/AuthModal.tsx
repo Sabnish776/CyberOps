@@ -36,12 +36,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess }) => {
     }
   };
 
-  const fillDemoCredentials = () => {
-    setIsRegister(false);
-    setEmail('admin@example.com');
-    setPassword('password123');
-    setError(null);
-  };
 
   return (
     <div className="modal-overlay">
@@ -122,11 +116,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess }) => {
                   />
                   <input
                     type="text"
+                    id="name"
+                    name="name"
                     className="form-control"
                     style={{ width: '100%', paddingLeft: '38px' }}
                     placeholder="John Doe"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    autoComplete="name"
                     required
                   />
                 </div>
@@ -149,11 +146,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess }) => {
                 />
                 <input
                   type="email"
+                  id="email"
+                  name="email"
                   className="form-control"
                   style={{ width: '100%', paddingLeft: '38px' }}
                   placeholder="name@company.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="username"
                   required
                 />
               </div>
@@ -175,11 +175,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess }) => {
                 />
                 <input
                   type="password"
+                  id="password"
+                  name="password"
                   className="form-control"
                   style={{ width: '100%', paddingLeft: '38px' }}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  autoComplete={isRegister ? "new-password" : "current-password"}
                   required
                 />
               </div>
@@ -194,31 +197,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess }) => {
               {loading ? 'Authenticating...' : isRegister ? 'Create Account' : 'Sign In'}
             </button>
 
-            {!isRegister && (
-              <div
-                onClick={fillDemoCredentials}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  fontSize: '0.75rem',
-                  color: 'var(--accent-cyan)',
-                  cursor: 'pointer',
-                  padding: '6px',
-                  borderRadius: '4px',
-                  background: 'rgba(0, 240, 255, 0.05)',
-                  border: '1px dashed rgba(0, 240, 255, 0.25)',
-                  marginTop: '0.25rem',
-                  transition: 'all 0.15s',
-                  fontFamily: 'var(--font-mono)'
-                }}
-                title="Click to auto-fill default demo credentials"
-              >
-                <Zap size={12} />
-                <span>Auto-fill Demo Credentials</span>
-              </div>
-            )}
           </div>
         </form>
       </div>
