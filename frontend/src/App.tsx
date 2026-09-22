@@ -14,6 +14,7 @@ import { RemoteDesktopModal } from './components/desktop/RemoteDesktopModal';
 import { ServiceManagerModal } from './components/services/ServiceManagerModal';
 import { BroadcastWorkspace } from './components/broadcast/BroadcastWorkspace';
 import { TunnelMatrixWorkspace } from './components/network/TunnelMatrixWorkspace';
+import { GuiGridWorkspace } from './components/desktop/GuiGridWorkspace';
 import { AuthModal } from './components/auth/AuthModal';
 import { api, authStorage } from './api/client';
 import { User, ServerProfile, TerminalTabItem, ServerCreateInput, ServerStatusInfo } from './types';
@@ -43,7 +44,7 @@ export const App: React.FC = () => {
   };
 
   // Filtering & View state
-  const [activeView, setActiveView] = useState<'dashboard' | 'terminal' | 'broadcast' | 'network'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'terminal' | 'broadcast' | 'network' | 'desktop'>('dashboard');
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -157,7 +158,7 @@ export const App: React.FC = () => {
   }, [user]);
 
   useEffect(() => {
-    if (activeView === 'terminal') {
+    if (activeView === 'terminal' || activeView === 'desktop') {
       setTimeout(() => {
         window.dispatchEvent(new Event('resize'));
       }, 50);
@@ -684,6 +685,21 @@ export const App: React.FC = () => {
             }}
           >
             <TunnelMatrixWorkspace servers={servers} isVisible={activeView === 'network'} />
+          </div>
+
+          {/* Desktop Grid View */}
+          <div
+            style={{
+              display: activeView === 'desktop' ? 'flex' : 'none',
+              flex: 1,
+              flexDirection: 'column',
+              height: '100%',
+              width: '100%',
+              overflow: 'hidden',
+              background: 'var(--bg-main)'
+            }}
+          >
+            <GuiGridWorkspace servers={filteredServers} isVisible={activeView === 'desktop'} />
           </div>
 
         </main>

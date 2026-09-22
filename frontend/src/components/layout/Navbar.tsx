@@ -5,8 +5,8 @@ import { User, TerminalTabItem } from '../../types';
 interface NavbarProps {
   user: User | null;
   activeTabs: TerminalTabItem[];
-  activeView: 'dashboard' | 'terminal' | 'broadcast' | 'network';
-  setActiveView: (view: 'dashboard' | 'terminal' | 'broadcast' | 'network') => void;
+  activeView: 'dashboard' | 'terminal' | 'broadcast' | 'network' | 'desktop';
+  setActiveView: (view: 'dashboard' | 'terminal' | 'broadcast' | 'network' | 'desktop') => void;
   onOpenAddServer: () => void;
   onLogout: () => void;
 }
@@ -55,6 +55,15 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <Share2 size={14} />
             <span>Tunnel Matrix</span>
+          </button>
+
+          <button
+            className={`btn btn-sm ${activeView === 'desktop' ? 'btn-primary' : 'btn-outline'}`}
+            style={{ border: 'none' }}
+            onClick={() => setActiveView('desktop')}
+          >
+            <Monitor size={14} />
+            <span>Desktops</span>
           </button>
 
           <button
