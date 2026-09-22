@@ -105,6 +105,7 @@ export interface TunnelCreateInput {
   remoteHost?: string;
   remotePort: number;
   autoStart?: boolean;
+  color?: string;
 }
 
 export interface DatabaseQueryInput {
