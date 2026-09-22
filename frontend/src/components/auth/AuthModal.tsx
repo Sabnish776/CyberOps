@@ -65,7 +65,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess }) => {
             CyberOps Command Center
           </h2>
           <p style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', marginTop: '0.35rem' }}>
-            {isRegister ? 'Create an account to manage your SSH servers' : 'Authenticate to access your SSH workspace'}
+            {isRegister ? 'Create an account to manage your SSH servers' : 'Authenticate to access your CyberOps workspace'}
           </p>
         </div>
 

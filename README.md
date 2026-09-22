@@ -1,6 +1,6 @@
 # CyberOps Command Center
 
-**A futuristic, Cyber-Ops web-based SSH workspace, remote service manager, database console, and SFTP browser.**  
+**A futuristic, Cyber-Ops web-based workspace, remote service manager, database console, and SFTP browser.**
 Connect to remote servers, cloud VPS instances, local machines, or Docker containers with zero keystroke latency, embedded zero-config SQLite storage, and deep automated service discovery.
 
 ---

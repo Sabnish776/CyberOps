@@ -25,7 +25,7 @@ public class EncryptionService {
     private static final int IV_LENGTH_BYTES = 12;
     private static final int TAG_LENGTH_BITS = 128;
 
-    @Value("${app.security.master-key:SshWorkspaceMasterEncKey202632B!}")
+    @Value("${app.security.master-key:CyberOpsMasterEncKey202632B!}")
     private String masterKeyString;
 
     private SecretKey secretKey;
