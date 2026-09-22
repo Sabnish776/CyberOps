@@ -31,8 +31,10 @@
   --accent-magenta: #ff007f;
   --accent-magenta-glow: rgba(255, 0, 127, 0.3);
   --accent-indigo: #818cf8;
+  --accent-purple: #a855f7;
   --accent-amber: #ffb700;
   --accent-rose: #ff3366;
+  --accent-red: #ef4444;
 
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.6);
   --shadow-lg: 0 12px 40px -8px rgba(0, 0, 0, 0.85);
