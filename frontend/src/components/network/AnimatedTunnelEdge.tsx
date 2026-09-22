@@ -34,9 +34,9 @@ export const AnimatedTunnelEdge = ({
       markerEnd={markerEnd}
       style={{
         ...style,
-        strokeWidth: 2.5,
+        strokeWidth: 3,
         stroke: edgeColor,
-        filter: `drop-shadow(0 0 4px ${edgeColor})`,
+        filter: `drop-shadow(0 0 6px ${edgeColor}) drop-shadow(0 0 12px ${edgeColor})`,
         animation: 'dashdraw 1s linear infinite'
       }}
       className="react-flow__edge-path animated-cyber-edge"

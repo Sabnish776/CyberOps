@@ -55,6 +55,7 @@ public class TunnelController {
                 .remoteHost(request.getRemoteHost() != null ? request.getRemoteHost().trim() : "127.0.0.1")
                 .remotePort(request.getRemotePort())
                 .autoStart(request.getAutoStart() != null ? request.getAutoStart() : false)
+                .color(request.getColor())
                 .build();
 
         final ServiceTunnel savedTunnel = tunnelRepository.save(tunnel);

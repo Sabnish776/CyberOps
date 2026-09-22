@@ -35,6 +35,8 @@ public class TunnelDtos {
 
         @Builder.Default
         private Boolean autoStart = false;
+
+        private String color;
     }
 
     @Getter
@@ -54,6 +56,7 @@ public class TunnelDtos {
         private boolean active;
         private String connectionString;
         private String cliCommand;
+        private String color;
         private OffsetDateTime createdAt;
     }
 }

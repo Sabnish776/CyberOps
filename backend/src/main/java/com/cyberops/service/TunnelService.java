@@ -226,6 +226,7 @@ public class TunnelService {
                 .active(active)
                 .connectionString(connStr)
                 .cliCommand(cli)
+                .color(tunnel.getColor())
                 .createdAt(tunnel.getCreatedAt())
                 .build();
     }

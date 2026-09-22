@@ -45,6 +45,9 @@ public class ServiceTunnel {
     @Builder.Default
     private Boolean autoStart = false;
 
+    @Column(length = 7)
+    private String color;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private OffsetDateTime createdAt;

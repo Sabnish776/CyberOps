@@ -68,6 +68,7 @@ const TunnelMatrixInner: React.FC<TunnelMatrixWorkspaceProps> = ({ servers, isVi
   const [serviceType, setServiceType] = useState('CUSTOM');
   const [remotePort, setRemotePort] = useState(8080);
   const [localPort, setLocalPort] = useState(8080);
+  const [tunnelColor, setTunnelColor] = useState('#00f0ff');
   const [isCreating, setIsCreating] = useState(false);
 
   // Tunnel details popup
@@ -143,13 +144,15 @@ const TunnelMatrixInner: React.FC<TunnelMatrixWorkspaceProps> = ({ servers, isVi
         serverHandleIndex[sourceId] = sIdx + 1;
         const tIdx = localHandleIndex++;
 
-        let edgeColor = '#00f0ff';
-        switch (tunnel.serviceType?.toUpperCase()) {
-          case 'POSTGRES': edgeColor = '#6495ED'; break;
-          case 'REDIS':    edgeColor = '#ff4d4d'; break;
-          case 'MYSQL':    edgeColor = '#f0a030'; break;
-          case 'MONGODB':  edgeColor = '#47A248'; break;
-          case 'HTTP':     edgeColor = '#e040fb'; break;
+        let edgeColor = tunnel.color || '#00f0ff';
+        if (!tunnel.color) {
+          switch (tunnel.serviceType?.toUpperCase()) {
+            case 'POSTGRES': edgeColor = '#6495ED'; break;
+            case 'REDIS':    edgeColor = '#ff4d4d'; break;
+            case 'MYSQL':    edgeColor = '#f0a030'; break;
+            case 'MONGODB':  edgeColor = '#47A248'; break;
+            case 'HTTP':     edgeColor = '#e040fb'; break;
+          }
         }
 
         const srcNode = prevNodes.find(n => n.id === sourceId);
@@ -177,7 +180,7 @@ const TunnelMatrixInner: React.FC<TunnelMatrixWorkspaceProps> = ({ servers, isVi
           id: `e-${tunnel.id}-a`,
           source: sourceId,
           target: waypointId,
-          sourceHandle: `source-${sIdx % handleCount}`,
+          sourceHandle: 'source-0',
           type: 'animatedTunnel',
           data: { edgeColorOverride: edgeColor },
         });
@@ -186,13 +189,16 @@ const TunnelMatrixInner: React.FC<TunnelMatrixWorkspaceProps> = ({ servers, isVi
           id: `e-${tunnel.id}-b`,
           source: waypointId,
           target: 'local',
-          targetHandle: `target-${tIdx % handleCount}`,
+          targetHandle: 'target-0',
           type: 'animatedTunnel',
           data: { edgeColorOverride: edgeColor },
         });
       });
 
-      const baseNodes = prevNodes.filter(n => !n.id.startsWith('wp-'));
+      const baseNodes = prevNodes.filter(n => !n.id.startsWith('wp-')).map(n => ({
+        ...n,
+        data: { ...n.data, handleCount }
+      }));
       return [...baseNodes, ...waypointNodes];
     });
 
@@ -229,9 +235,13 @@ const TunnelMatrixInner: React.FC<TunnelMatrixWorkspaceProps> = ({ servers, isVi
     const portMap: Record<string, number> = {
       POSTGRES: 5432, MYSQL: 3306, REDIS: 6379, MONGODB: 27017, HTTP: 80
     };
+    const colorMap: Record<string, string> = {
+      POSTGRES: '#6495ED', MYSQL: '#f0a030', REDIS: '#ff4d4d', MONGODB: '#47A248', HTTP: '#e040fb', CUSTOM: '#00f0ff'
+    };
     const port = portMap[type] || 8080;
     setRemotePort(port);
     setLocalPort(port);
+    setTunnelColor(colorMap[type] || '#00f0ff');
   };
 
   // ── Create tunnel ──
@@ -246,7 +256,8 @@ const TunnelMatrixInner: React.FC<TunnelMatrixWorkspaceProps> = ({ servers, isVi
         localPort,
         remotePort,
         remoteHost: '127.0.0.1',
-        autoStart: true
+        autoStart: true,
+        color: tunnelColor
       });
       setPendingConnection(null);
       loadTunnels();
@@ -349,6 +360,10 @@ const TunnelMatrixInner: React.FC<TunnelMatrixWorkspaceProps> = ({ servers, isVi
               <div className="form-group" style={{ flex: 1 }}>
                 <label>Local Port</label>
                 <input type="text" className="form-control" value={localPort} onChange={e => setLocalPort(Number(e.target.value) || 0)} />
+              </div>
+              <div className="form-group" style={{ width: '80px' }}>
+                <label>Color</label>
+                <input type="color" className="form-control" value={tunnelColor} onChange={e => setTunnelColor(e.target.value)} style={{ padding: '2px', height: '36px', cursor: 'pointer' }} />
               </div>
             </div>
           </div>

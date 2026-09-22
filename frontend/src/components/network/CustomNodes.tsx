@@ -25,23 +25,19 @@ export const LocalNode = ({ data }: { data: any }) => {
       gap: '8px',
       position: 'relative'
     }}>
-      {/* Spread handles along the top */}
-      {Array.from({ length: handleCount }).map((_, i) => (
-        <Handle
-          key={`target-${i}`}
-          type="target"
-          position={Position.Top}
-          id={`target-${i}`}
-          style={{
-            background: 'var(--accent-cyan)',
-            width: '8px',
-            height: '8px',
-            left: `${((i + 1) / (handleCount + 1)) * 100}%`,
-            top: '-4px',
-            opacity: 0.6
-          }}
-        />
-      ))}
+      {/* Single centralized handle */}
+      <Handle
+        type="target"
+        position={Position.Top}
+        id="target-0"
+        style={{
+          background: 'var(--accent-cyan)',
+          width: '10px',
+          height: '10px',
+          top: '-5px',
+          opacity: 0.8
+        }}
+      />
       <Monitor size={28} color="var(--accent-cyan)" />
       <div style={{ fontWeight: 'bold', color: 'var(--text-primary)', letterSpacing: '1.5px', fontSize: '0.9rem' }}>LOCAL MACHINE</div>
       <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', opacity: 0.8 }}>127.0.0.1</div>
@@ -76,23 +72,19 @@ export const ServerNode = ({ data }: { data: any }) => {
         {server.host}
       </div>
 
-      {/* Spread handles along the bottom */}
-      {Array.from({ length: handleCount }).map((_, i) => (
-        <Handle
-          key={`source-${i}`}
-          type="source"
-          position={Position.Bottom}
-          id={`source-${i}`}
-          style={{
-            background: 'var(--accent-emerald)',
-            width: '8px',
-            height: '8px',
-            left: `${((i + 1) / (handleCount + 1)) * 100}%`,
-            bottom: '-4px',
-            opacity: 0.6
-          }}
-        />
-      ))}
+      {/* Single centralized handle */}
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        id="source-0"
+        style={{
+          background: 'var(--accent-emerald)',
+          width: '10px',
+          height: '10px',
+          bottom: '-5px',
+          opacity: 0.8
+        }}
+      />
     </div>
   );
 };

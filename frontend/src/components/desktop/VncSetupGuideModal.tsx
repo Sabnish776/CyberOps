@@ -77,7 +77,7 @@ cat << 'EOF' > ~/.vnc/xstartup
 #!/bin/sh
 unset SESSION_MANAGER
 unset DBUS_SESSION_BUS_ADDRESS
-exec startxfce4
+exec dbus-launch xfce4-session
 EOF
 
 # 5. Make the script executable
