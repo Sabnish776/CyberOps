@@ -119,7 +119,7 @@ export const RemoteDesktopModal: React.FC<RemoteDesktopModalProps> = ({
       });
 
       rfb.scaleViewport = true;
-      rfb.resizeSession = true;
+      rfb.resizeSession = false;
 
       rfbRef.current = rfb;
       
