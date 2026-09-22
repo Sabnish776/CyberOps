@@ -26,7 +26,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="brand-icon-wrapper">
             <Terminal size={20} />
           </div>
-          <span>SSH Workspace</span>
+          <span>CyberOps</span>
         </div>
 
         <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(30, 41, 59, 0.6)', padding: '3px', borderRadius: '8px' }}>

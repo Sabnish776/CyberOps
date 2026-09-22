@@ -3,9 +3,9 @@ server:
 
 spring:
   application:
-    name: ssh-workspace-manager
+    name: cyberops-backend
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:sqlite:sshworkspace.db}
+    url: ${SPRING_DATASOURCE_URL:jdbc:sqlite:cyberops.db}
     driver-class-name: org.sqlite.JDBC
   jpa:
     database-platform: org.hibernate.community.dialect.SQLiteDialect

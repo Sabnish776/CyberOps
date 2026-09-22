@@ -62,7 +62,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess }) => {
             <Terminal size={32} />
           </div>
           <h2 style={{ fontSize: '1.4rem', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
-            SSH Workspace Manager
+            CyberOps Command Center
           </h2>
           <p style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', marginTop: '0.35rem' }}>
             {isRegister ? 'Create an account to manage your SSH servers' : 'Authenticate to access your SSH workspace'}

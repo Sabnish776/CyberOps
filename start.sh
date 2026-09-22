@@ -5,7 +5,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
 echo "=========================================================="
-echo "  Starting SSH Workspace Manager"
+echo "  Starting CyberOps Command Center"
 echo "=========================================================="
 
 # 1. Environment & Prerequisite Checks
@@ -82,7 +82,7 @@ done
 
 echo ""
 echo "=========================================================="
-echo "  SSH Workspace Manager is LIVE!"
+echo "  CyberOps Command Center is LIVE!"
 echo "  URL:         http://localhost:5173/"
 echo "  Credentials: admin@example.com / password123"
 echo "=========================================================="

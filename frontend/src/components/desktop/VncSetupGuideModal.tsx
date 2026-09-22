@@ -184,7 +184,7 @@ Remove-Item "tightvnc.msi"`}
           {activeTab === 'macos' && (
             <div className="setup-guide-content">
               <h3>Apple macOS</h3>
-              <p>macOS comes with a built-in VNC server! It is perfectly compatible with the SSH Workspace Manager without needing to download anything.</p>
+              <p>macOS comes with a built-in VNC server! It is perfectly compatible with the CyberOps Command Center without needing to download anything.</p>
               
               <ol style={{ marginLeft: '1.5rem', marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                 <li>Open <strong>System Settings</strong> (or System Preferences).</li>
