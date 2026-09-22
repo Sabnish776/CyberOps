@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 echo ==========================================================
-echo   Starting SSH Workspace Manager (Windows)
+echo   Starting CyberOps Command Center (Windows)
 echo ==========================================================
 
 :: 1. Check Java Prerequisite
@@ -43,15 +43,15 @@ for /f "tokens=5" %%a in ('netstat -aon 2^>nul ^| findstr ":5173" ^| findstr "LI
 echo === 1. Starting Spring Boot Backend (port 8080) ===
 cd /d "%~dp0backend"
 if exist mvnw.cmd (
-    start "SSH Workspace - Backend" /min cmd /c "mvnw.cmd spring-boot:run > backend.log 2>&1"
+    start "CyberOps - Backend" /min cmd /c "mvnw.cmd spring-boot:run > backend.log 2>&1"
 ) else (
-    start "SSH Workspace - Backend" /min cmd /c "mvn spring-boot:run > backend.log 2>&1"
+    start "CyberOps - Backend" /min cmd /c "mvn spring-boot:run > backend.log 2>&1"
 )
 
 :: 6. Start React Frontend Dev Server
 echo === 2. Starting React Frontend Dev Server (port 5173) ===
 cd /d "%~dp0frontend"
-start "SSH Workspace - Frontend" /min cmd /c "npm run dev > frontend.log 2>&1"
+start "CyberOps - Frontend" /min cmd /c "npm run dev > frontend.log 2>&1"
 
 :: 7. Wait for Backend Readiness
 echo.
@@ -68,7 +68,7 @@ for /l %%i in (1,1,30) do (
 :ready
 echo.
 echo ==========================================================
-echo   SSH Workspace Manager is LIVE!
+echo   CyberOps Command Center is LIVE!
 echo   URL:         http://localhost:5173/
 echo   Credentials: admin@example.com / password123
 echo ==========================================================

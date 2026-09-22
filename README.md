@@ -43,7 +43,7 @@ Connect to remote servers, cloud VPS instances, local machines, or Docker contai
 +---------------------------------┬----------------------------------┬-------------------------------+
                                   | Embedded JDBC                    | SSH Exec / PTY / SFTP Channels
                                   v                                  v
-                 SQLite (`backend/sshworkspace.db`)         Remote SSH Targets / Cloud / Localhost
+                 SQLite (`backend/cyberops.db`)         Remote SSH Targets / Cloud / Localhost
 ```
 
 ---
@@ -112,7 +112,7 @@ Connect to remote servers, cloud VPS instances, local machines, or Docker contai
 * **Orchestration**: A unified `docker-compose.yml` to spin up the entire Devkit with a single `docker compose up -d` command.
 
 ### 10. Embedded SQLite Database
-* **Zero External Dependencies**: Stores all profiles, encrypted credentials, and tunnels in `backend/sshworkspace.db`. No PostgreSQL container or external database server required. Cold start in ~4 seconds.
+* **Zero External Dependencies**: Stores all profiles, encrypted credentials, and tunnels in `backend/cyberops.db`. No PostgreSQL container or external database server required. Cold start in ~4 seconds.
 
 ### 11. Security & Credential Vault
 * **AES-256-GCM Encryption**: Passwords and private keys are encrypted at rest using AES-256 in Galois/Counter Mode with 128-bit authentication tags.
@@ -167,7 +167,7 @@ To prevent accidental cluster disasters or unauthorized tampering if your comput
 ```
 Devkit/
 ├── backend/
-│   ├── src/main/java/com/sshworkspace/
+│   ├── src/main/java/com/cyberops/
 │   │   ├── config/              # Security, SQLite dialect, WebMvc, WebSocket config
 │   │   ├── controller/          # REST Controllers (Auth, Server, Broadcast, Service, DB, SFTP, Tunnels)
 │   │   ├── dto/                 # Request/Response Data Transfer Objects (BroadcastRequest, etc.)
@@ -176,12 +176,12 @@ Devkit/
 │   │   ├── security/            # JWT Token Provider, Filters, UserDetails
 │   │   ├── service/             # SshClient, Broadcast, CommandSafety, ServiceManager, Database, Sftp
 │   │   ├── websocket/           # TerminalWebSocketHandler (Full-duplex PTY streaming)
-│   │   └── SshWorkspaceApplication.java
+│   │   └── CyberOpsApplication.java
 │   ├── src/main/resources/
 │   │   ├── application.yml      # SQLite DB, JWT secret, logging config
 │   │   └── db/migration/        # SQLite schema initialization
 │   ├── pom.xml                  # Maven dependencies (Spring Boot 3, Apache MINA, SQLite)
-│   └── sshworkspace.db          # Embedded database file (auto-created)
+│   └── cyberops.db          # Embedded database file (auto-created)
 ├── frontend/
 │   ├── src/
 │   │   ├── api/                 # Axios client, Auth, Server, Cluster Broadcast, Service, SFTP endpoints
@@ -251,7 +251,7 @@ This will automatically:
 cd backend
 mvn spring-boot:run
 ```
-*Backend runs on `http://localhost:8080` with SQLite at `backend/sshworkspace.db`.*
+*Backend runs on `http://localhost:8080` with SQLite at `backend/cyberops.db`.*
 
 **Frontend**:
 ```bash
@@ -274,7 +274,7 @@ npm run dev
 
 ## Connecting to Your Local Machine
 
-You can use SSH Workspace to manage your local machine:
+You can use CyberOps to manage your local machine:
 
 1. **Ensure OpenSSH Server is running on your machine**:
    ```bash
@@ -291,7 +291,7 @@ You can use SSH Workspace to manage your local machine:
    # macOS
    # System Settings -> General -> Sharing -> Enable 'Remote Login'
    ```
-2. **Add the profile in SSH Workspace**:
+2. **Add the profile in CyberOps**:
    * Open [http://localhost:5173/](http://localhost:5173/) and click **`+ Add Server Profile`**.
    * **Profile Name**: `Localhost`
    * **Hostname**: `127.0.0.1` (or `localhost`)
@@ -320,10 +320,10 @@ You can use SSH Workspace to manage your local machine:
 | Variable | Default Value | Description |
 |---|---|---|
 | `SERVER_PORT` | `8080` | Backend HTTP & WebSocket port |
-| `SPRING_DATASOURCE_URL` | `jdbc:sqlite:sshworkspace.db` | SQLite JDBC connection string |
-| `JWT_SECRET` | `S3cur3SShW0rksp4c3M4n4g3rJwTS3cr3tK3y2026!@#$` | Secret key used for signing JWT tokens |
+| `SPRING_DATASOURCE_URL` | `jdbc:sqlite:cyberops.db` | SQLite JDBC connection string |
+| `JWT_SECRET` | `S3cur3Cyb3rOpsJwTS3cr3tK3y2026!@#$` | Secret key used for signing JWT tokens |
 | `JWT_EXPIRATION_MS` | `86400000` (24h) | JWT session validity duration in milliseconds |
-| `APP_MASTER_KEY` | `SshWorkspaceMasterEncKey202632B!` | 32-byte AES key for encrypting credentials at rest |
+| `APP_MASTER_KEY` | `CyberOpsMasterEncKey202632B!` | 32-byte AES key for encrypting credentials at rest |
 | `SSH_CONNECT_TIMEOUT_MS` | `30000` (30s) | SSH connection and authentication timeout in milliseconds |
 | `SSH_CHANNEL_TIMEOUT_MS` | `30000` (30s) | SSH PTY/Shell channel open verification timeout in milliseconds |
 | `SSH_EXEC_TIMEOUT_MS` | `30000` (30s) | Timeout for remote diagnostic & service execution commands |

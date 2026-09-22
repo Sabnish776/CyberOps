@@ -1,4 +1,4 @@
--- Database schema for SSH Workspace Manager
+-- Database schema for CyberOps Command Center
 -- SRS v1.0 Section 15
 
 CREATE TABLE IF NOT EXISTS users (

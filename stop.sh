@@ -4,13 +4,13 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
 echo "=========================================================="
-echo "  Stopping SSH Workspace Manager Services"
+echo "  Stopping CyberOps Command Center Services"
 echo "=========================================================="
 
 echo "--> Terminating Spring Boot Backend..."
-pkill -f "com.sshworkspace.SshWorkspaceApplication" 2>/dev/null || true
+pkill -f "com.cyberops.CyberOpsApplication" 2>/dev/null || true
 pkill -f "spring-boot:run" 2>/dev/null || true
-pkill -f "ssh-workspace-manager" 2>/dev/null || true
+pkill -f "cyberops" 2>/dev/null || true
 
 echo "--> Terminating Frontend Dev Server..."
 pkill -f "vite" 2>/dev/null || true

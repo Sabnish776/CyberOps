@@ -1,10 +1,10 @@
-# SSH Workspace Manager - PowerShell Startup Script
+# CyberOps Command Center - PowerShell Startup Script
 $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 Set-Location $ScriptDir
 
 Write-Host "==========================================================" -ForegroundColor Cyan
-Write-Host "  Starting SSH Workspace Manager (Windows PowerShell)" -ForegroundColor Cyan
+Write-Host "  Starting CyberOps Command Center (Windows PowerShell)" -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Cyan
 
 # 1. Check Java
@@ -73,7 +73,7 @@ for ($i = 1; $i -le 30; $i++) {
 
 Write-Host ""
 Write-Host "==========================================================" -ForegroundColor Cyan
-Write-Host "  SSH Workspace Manager is LIVE!" -ForegroundColor Green
+Write-Host "  CyberOps Command Center is LIVE!" -ForegroundColor Green
 Write-Host "  URL:         http://localhost:5173/" -ForegroundColor Yellow
 Write-Host "  Credentials: admin@example.com / password123" -ForegroundColor White
 Write-Host "==========================================================" -ForegroundColor Cyan

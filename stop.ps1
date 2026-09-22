@@ -1,8 +1,8 @@
-# SSH Workspace Manager - PowerShell Stop Script
+# CyberOps Command Center - PowerShell Stop Script
 $ErrorActionPreference = "Continue"
 
 Write-Host "==========================================================" -ForegroundColor Cyan
-Write-Host "  Stopping SSH Workspace Manager Services (PowerShell)" -ForegroundColor Cyan
+Write-Host "  Stopping CyberOps Command Center Services (PowerShell)" -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Cyan
 
 # Terminate listeners on ports 8080 and 5173
@@ -20,8 +20,8 @@ Write-Host "==========================================================" -Foregro
 }
 
 # Clean up any lingering processes
-Get-Process -Name "java" -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowTitle -like "*SSH Workspace*" } | Stop-Process -Force -ErrorAction SilentlyContinue
-Get-Process -Name "node" -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowTitle -like "*SSH Workspace*" } | Stop-Process -Force -ErrorAction SilentlyContinue
+Get-Process -Name "java" -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowTitle -like "*CyberOps*" } | Stop-Process -Force -ErrorAction SilentlyContinue
+Get-Process -Name "node" -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowTitle -like "*CyberOps*" } | Stop-Process -Force -ErrorAction SilentlyContinue
 
 Write-Host "==========================================================" -ForegroundColor Cyan
 Write-Host "  All services have been stopped." -ForegroundColor Green

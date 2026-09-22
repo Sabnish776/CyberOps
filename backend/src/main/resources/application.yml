@@ -34,6 +34,6 @@ app:
 logging:
   level:
     root: INFO
-    com.sshworkspace: DEBUG
+    com.cyberops: DEBUG
     org.apache.sshd: INFO
     org.springframework.web.socket: INFO
