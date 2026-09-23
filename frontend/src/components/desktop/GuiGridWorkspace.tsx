@@ -280,6 +280,8 @@ const GuiCard: React.FC<{ server: ServerProfile }> = ({ server }) => {
           <SimpleKeyboard
             layoutName={keyboardLayout}
             onKeyPress={handleKeyPress}
+            preventMouseDownDefault={true}
+            physicalKeyboardHighlight={false}
             theme="hg-theme-default hg-layout-default myTheme"
             display={{
               '{bksp}': 'backspace',
