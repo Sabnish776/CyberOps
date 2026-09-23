@@ -25,8 +25,15 @@ export const RemoteDesktopModal: React.FC<RemoteDesktopModalProps> = ({
   
   const modalRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<RemoteDesktopViewRef>(null);
+  const lastKeyRef = useRef<{key: string, time: number}>({ key: '', time: 0 });
 
   const handleKeyPress = (button: string) => {
+    const now = Date.now();
+    if (lastKeyRef.current.key === button && now - lastKeyRef.current.time < 100) {
+      return;
+    }
+    lastKeyRef.current = { key: button, time: now };
+
     if (button === '{shift}' || button === '{lock}') {
       setKeyboardLayout(keyboardLayout === 'default' ? 'shift' : 'default');
       return;
