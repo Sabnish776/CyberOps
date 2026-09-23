@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { X, Monitor, AlertCircle, RefreshCw, Maximize, Keyboard } from 'lucide-react';
+import { X, Monitor, AlertCircle, RefreshCw, Maximize, Keyboard, Command } from 'lucide-react';
 import { ServerProfile } from '../../types';
 import { VncSetupGuideModal } from './VncSetupGuideModal';
 import { RemoteDesktopView, RemoteDesktopViewRef } from './RemoteDesktopView';
+import SimpleKeyboard from 'react-simple-keyboard';
+import 'react-simple-keyboard/build/css/index.css';
 
 interface RemoteDesktopModalProps {
   server: ServerProfile | null;
@@ -17,10 +19,44 @@ export const RemoteDesktopModal: React.FC<RemoteDesktopModalProps> = ({
 }) => {
   const [isSetupGuideOpen, setIsSetupGuideOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [keyboardLayout, setKeyboardLayout] = useState('default');
   const [connectState, setConnectState] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
   
   const modalRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<RemoteDesktopViewRef>(null);
+
+  const handleKeyPress = (button: string) => {
+    if (button === '{shift}' || button === '{lock}') {
+      setKeyboardLayout(keyboardLayout === 'default' ? 'shift' : 'default');
+      return;
+    }
+
+    if (!viewRef.current) return;
+
+    let keysym = 0;
+    if (button.length === 1) {
+      keysym = button.charCodeAt(0);
+    } else {
+      switch (button) {
+        case '{bksp}': keysym = 0xFF08; break;
+        case '{tab}': keysym = 0xFF09; break;
+        case '{enter}': keysym = 0xFF0D; break;
+        case '{escape}': keysym = 0xFF1B; break;
+        case '{space}': keysym = 0x0020; break;
+      }
+    }
+
+    if (keysym) {
+      viewRef.current.sendKey(keysym, true);
+      viewRef.current.sendKey(keysym, false);
+    }
+  };
+
+  // Tell noVNC to resize its canvas whenever the keyboard toggles
+  useEffect(() => {
+    setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
+  }, [showKeyboard]);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -74,8 +110,15 @@ export const RemoteDesktopModal: React.FC<RemoteDesktopModalProps> = ({
             <span>Remote Desktop: {server.name}</span>
           </h2>
           <div style={{ display: 'flex', gap: '10px' }}>
-            <button className="btn btn-outline btn-icon" onClick={() => viewRef.current?.sendCtrlAltDel()} title="Send Ctrl+Alt+Del">
+            <button 
+              className={`btn btn-icon ${showKeyboard ? 'btn-primary' : 'btn-outline'}`} 
+              onClick={() => setShowKeyboard(!showKeyboard)} 
+              title="Toggle Virtual Keyboard"
+            >
               <Keyboard size={18} />
+            </button>
+            <button className="btn btn-outline btn-icon" onClick={() => viewRef.current?.sendCtrlAltDel()} title="Send Ctrl+Alt+Del">
+              <Command size={18} />
             </button>
             <button className="btn btn-outline btn-icon" onClick={toggleFullscreen} title="Fullscreen">
               <Maximize size={18} />
@@ -118,6 +161,7 @@ export const RemoteDesktopModal: React.FC<RemoteDesktopModalProps> = ({
         <div 
           style={{ 
             flex: 1, 
+            minHeight: 0,
             position: 'relative',
             background: '#000',
             overflow: 'hidden'
@@ -130,6 +174,32 @@ export const RemoteDesktopModal: React.FC<RemoteDesktopModalProps> = ({
             onConnectStateChange={(state) => setConnectState(state)}
           />
         </div>
+
+        {showKeyboard && (
+          <div style={{ 
+            background: 'var(--bg-card)', 
+            padding: '0.5rem', 
+            borderTop: '1px solid var(--border-subtle)',
+            flexShrink: 0
+          }}>
+            <SimpleKeyboard
+              layoutName={keyboardLayout}
+              onKeyPress={handleKeyPress}
+              theme="hg-theme-default hg-layout-default myTheme"
+              display={{
+                '{bksp}': 'backspace',
+                '{enter}': 'enter',
+                '{shift}': 'shift',
+                '{s}': 'shift',
+                '{tab}': 'tab',
+                '{lock}': 'caps',
+                '{accept}': 'Submit',
+                '{space}': ' ',
+                '{escape}': 'esc'
+              }}
+            />
+          </div>
+        )}
       </div>
 
       <VncSetupGuideModal 

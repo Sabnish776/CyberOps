@@ -8,6 +8,7 @@ import RFB from '@novnc/novnc';
 
 export interface RemoteDesktopViewRef {
   sendCtrlAltDel: () => void;
+  sendKey: (keysym: number, down: boolean) => void;
   reconnect: () => void;
   disconnect: () => void;
 }
@@ -49,6 +50,11 @@ export const RemoteDesktopView = forwardRef<RemoteDesktopViewRef, RemoteDesktopV
     sendCtrlAltDel: () => {
       if (rfbRef.current) {
         rfbRef.current.sendCtrlAltDel();
+      }
+    },
+    sendKey: (keysym: number, down: boolean) => {
+      if (rfbRef.current) {
+        rfbRef.current.sendKey(keysym, down);
       }
     },
     reconnect: connectVnc,

@@ -16,7 +16,8 @@
     "@xyflow/react": "^12.11.6",
     "lucide-react": "^0.441.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-simple-keyboard": "^3.8.276"
   },
   "devDependencies": {
     "@types/react": "^18.3.5",

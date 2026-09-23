@@ -2523,3 +2523,34 @@ textarea.form-control {
 }
 
 
+
+/* Custom Dark Theme for react-simple-keyboard */
+.hg-theme-default {
+  background-color: transparent !important;
+  color: var(--text-primary) !important;
+  font-family: var(--font-mono) !important;
+}
+
+.hg-theme-default .hg-button {
+  background: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
+  transition: all 0.1s ease !important;
+}
+
+.hg-theme-default .hg-button:active {
+  background: rgba(168, 85, 247, 0.25) !important;
+  color: var(--accent-purple) !important;
+  border-bottom-color: var(--accent-purple) !important;
+}
+
+.hg-theme-default .hg-button.hg-standardBtn {
+  font-size: 0.9rem !important;
+}
+
+.hg-theme-default .hg-button.hg-functionBtn {
+  font-size: 0.8rem !important;
+  background: var(--bg-secondary) !important;
+  color: var(--text-secondary) !important;
+}

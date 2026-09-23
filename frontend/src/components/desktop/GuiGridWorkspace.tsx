@@ -1,8 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { ServerProfile } from '../../types';
-import { Monitor, Maximize, Keyboard, Power, Activity, Terminal, BookOpen } from 'lucide-react';
+import { Monitor, Maximize, Keyboard, Power, Activity, Terminal, BookOpen, Command } from 'lucide-react';
 import { RemoteDesktopView, RemoteDesktopViewRef } from './RemoteDesktopView';
 import { VncSetupGuideModal } from './VncSetupGuideModal';
+import SimpleKeyboard from 'react-simple-keyboard';
+import 'react-simple-keyboard/build/css/index.css';
 
 interface GuiGridWorkspaceProps {
   servers: ServerProfile[];
@@ -76,8 +78,37 @@ export const GuiGridWorkspace: React.FC<GuiGridWorkspaceProps> = ({ servers, isV
 const GuiCard: React.FC<{ server: ServerProfile }> = ({ server }) => {
   const [active, setActive] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [keyboardLayout, setKeyboardLayout] = useState('default');
   const cardRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<RemoteDesktopViewRef>(null);
+
+  const handleKeyPress = (button: string) => {
+    if (button === '{shift}' || button === '{lock}') {
+      setKeyboardLayout(keyboardLayout === 'default' ? 'shift' : 'default');
+      return;
+    }
+
+    if (!viewRef.current) return;
+
+    let keysym = 0;
+    if (button.length === 1) {
+      keysym = button.charCodeAt(0);
+    } else {
+      switch (button) {
+        case '{bksp}': keysym = 0xFF08; break;
+        case '{tab}': keysym = 0xFF09; break;
+        case '{enter}': keysym = 0xFF0D; break;
+        case '{escape}': keysym = 0xFF1B; break;
+        case '{space}': keysym = 0x0020; break;
+      }
+    }
+
+    if (keysym) {
+      viewRef.current.sendKey(keysym, true);
+      viewRef.current.sendKey(keysym, false);
+    }
+  };
 
   const handleToggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -103,6 +134,11 @@ const GuiCard: React.FC<{ server: ServerProfile }> = ({ server }) => {
     document.addEventListener('fullscreenchange', handleFsChange);
     return () => document.removeEventListener('fullscreenchange', handleFsChange);
   }, []);
+
+  // Tell noVNC to resize its canvas whenever the keyboard toggles
+  React.useEffect(() => {
+    setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
+  }, [showKeyboard]);
 
   return (
     <div 
@@ -158,14 +194,24 @@ const GuiCard: React.FC<{ server: ServerProfile }> = ({ server }) => {
 
         <div style={{ display: 'flex', gap: '8px' }}>
           {active && (
-            <button 
-              className="btn btn-outline btn-icon" 
-              onClick={() => viewRef.current?.sendCtrlAltDel()} 
-              title="Send Ctrl+Alt+Del"
-              style={{ padding: '6px' }}
-            >
-              <Keyboard size={14} />
-            </button>
+            <>
+              <button 
+                className={`btn btn-icon ${showKeyboard ? 'btn-primary' : 'btn-outline'}`} 
+                onClick={() => setShowKeyboard(!showKeyboard)} 
+                title="Toggle Virtual Keyboard"
+                style={{ padding: '6px' }}
+              >
+                <Keyboard size={14} />
+              </button>
+              <button 
+                className="btn btn-outline btn-icon" 
+                onClick={() => viewRef.current?.sendCtrlAltDel()} 
+                title="Send Ctrl+Alt+Del"
+                style={{ padding: '6px' }}
+              >
+                <Command size={14} />
+              </button>
+            </>
           )}
           <button 
             className="btn btn-outline btn-icon" 
@@ -193,7 +239,7 @@ const GuiCard: React.FC<{ server: ServerProfile }> = ({ server }) => {
         </div>
       </div>
 
-      <div style={{ flex: 1, position: 'relative', background: '#0a0f18' }}>
+      <div style={{ flex: 1, minHeight: 0, position: 'relative', background: '#0a0f18' }}>
         {!active ? (
           <div 
             style={{ 
@@ -224,6 +270,31 @@ const GuiCard: React.FC<{ server: ServerProfile }> = ({ server }) => {
           />
         )}
       </div>
+
+      {active && showKeyboard && (
+        <div style={{ 
+          background: 'var(--bg-card)', 
+          padding: '0.5rem', 
+          borderTop: '1px solid var(--border-subtle)' 
+        }}>
+          <SimpleKeyboard
+            layoutName={keyboardLayout}
+            onKeyPress={handleKeyPress}
+            theme="hg-theme-default hg-layout-default myTheme"
+            display={{
+              '{bksp}': 'backspace',
+              '{enter}': 'enter',
+              '{shift}': 'shift',
+              '{s}': 'shift',
+              '{tab}': 'tab',
+              '{lock}': 'caps',
+              '{accept}': 'Submit',
+              '{space}': ' ',
+              '{escape}': 'esc'
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };
