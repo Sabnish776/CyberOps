@@ -189,6 +189,12 @@ public class ServiceManagerService {
             throw new IllegalArgumentException("Invalid action: " + request.getAction());
         }
 
+        if (request.getSudoPassword() != null && !request.getSudoPassword().isBlank()) {
+            if (request.getSudoPassword().contains("\n") || request.getSudoPassword().contains("\r") || request.getSudoPassword().contains("\0")) {
+                throw new IllegalArgumentException("Invalid sudo password: newline or null characters not permitted");
+            }
+        }
+
         // Sanitize service name against shell injection
         String safeServiceName = request.getServiceName().replaceAll("[^a-zA-Z0-9_.-]", "");
         if (safeServiceName.isBlank()) {

@@ -4,6 +4,7 @@ import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
 import { RefreshCw, Trash2, Maximize2, Minimize2, ZoomIn, ZoomOut, Zap, CornerDownLeft } from 'lucide-react';
 import { TerminalTabItem } from '../../types';
+import { authStorage } from '../../api/client';
 
 interface TerminalViewProps {
   tab: TerminalTabItem;
@@ -64,7 +65,9 @@ export const TerminalView: React.FC<TerminalViewProps> = ({
       const apiUrl = new URL(meta.env.VITE_API_URL);
       host = apiUrl.host;
     }
-    const wsUrl = `${protocol}//${host}/ws/terminal/${tab.id}`;
+    const token = authStorage.getToken();
+    const tokenParam = token ? `?token=${encodeURIComponent(token)}` : '';
+    const wsUrl = `${protocol}//${host}/ws/terminal/${tab.id}${tokenParam}`;
     const ws = new WebSocket(wsUrl);
     socketRef.current = ws;
 

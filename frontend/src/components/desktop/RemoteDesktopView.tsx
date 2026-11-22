@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { ServerProfile } from '../../types';
-import { api } from '../../api/client';
+import { api, authStorage } from '../../api/client';
 import { CyberPopup } from '../common/CyberPopup';
 // @ts-ignore
 import RFB from '@novnc/novnc';
@@ -118,7 +118,9 @@ export const RemoteDesktopView = forwardRef<RemoteDesktopViewRef, RemoteDesktopV
         const apiUrl = new URL(meta.env.VITE_API_URL);
         host = apiUrl.host;
       }
-      const wsUrl = `${protocol}//${host}/ws/desktop/${sessionId}`;
+      const token = authStorage.getToken();
+      const tokenParam = token ? `?token=${encodeURIComponent(token)}` : '';
+      const wsUrl = `${protocol}//${host}/ws/desktop/${sessionId}${tokenParam}`;
 
       const rfb = new RFB(containerRef.current, wsUrl, {
         wsProtocols: ['binary'],

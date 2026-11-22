@@ -37,6 +37,8 @@ public class DatabaseService {
         ServerProfile server = serverRepository.findByIdAndUserId(serverId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("Server not found"));
 
+        validateQueryRequest(request);
+
         long startTime = System.currentTimeMillis();
 
         String password = null;
@@ -65,6 +67,10 @@ public class DatabaseService {
                 channel.setOut(out);
                 channel.setErr(err);
 
+                // Securely pipe query via stdin so the bash shell never interprets quotes, variables, or subshells
+                byte[] queryBytes = (request.getQuery().trim() + "\n").getBytes(StandardCharsets.UTF_8);
+                channel.setIn(new java.io.ByteArrayInputStream(queryBytes));
+
                 channel.open().verify(channelOpenTimeoutMs, TimeUnit.MILLISECONDS);
                 channel.waitFor(EnumSet.of(org.apache.sshd.client.channel.ClientChannelEvent.CLOSED), execTimeoutMs);
 
@@ -92,47 +98,93 @@ public class DatabaseService {
         }
     }
 
+    private void validateQueryRequest(DatabaseQueryRequest req) {
+        if (req.getQuery() == null || req.getQuery().isBlank()) {
+            throw new IllegalArgumentException("Query cannot be blank");
+        }
+        if (req.getUsername() != null && !req.getUsername().isBlank()) {
+            if (!req.getUsername().matches("^[a-zA-Z0-9_.-]+$")) {
+                throw new IllegalArgumentException("Invalid username: contains disallowed characters");
+            }
+        }
+        if (req.getDatabaseName() != null && !req.getDatabaseName().isBlank()) {
+            if (!req.getDatabaseName().matches("^[a-zA-Z0-9_.-]+$")) {
+                throw new IllegalArgumentException("Invalid database name: contains disallowed characters");
+            }
+        }
+        if (req.getPort() != null && (req.getPort() < 1 || req.getPort() > 65535)) {
+            throw new IllegalArgumentException("Invalid port number: must be between 1 and 65535");
+        }
+        if (req.getPassword() != null && (req.getPassword().contains("\n") || req.getPassword().contains("\r") || req.getPassword().contains("\0"))) {
+            throw new IllegalArgumentException("Invalid password: newline or null characters not permitted");
+        }
+    }
+
     private String buildRemoteCommand(DatabaseQueryRequest req) {
-        String type = req.getServiceType().toUpperCase();
-        String safeQuery = req.getQuery().replace("\"", "\\\"");
+        String type = req.getServiceType() != null ? req.getServiceType().toUpperCase() : "";
 
         switch (type) {
             case "MYSQL": {
                 StringBuilder sb = new StringBuilder("mysql ");
-                if (req.getUsername() != null && !req.getUsername().isBlank()) sb.append("-u ").append(req.getUsername()).append(" ");
-                else sb.append("-u root ");
+                if (req.getUsername() != null && !req.getUsername().isBlank()) {
+                    sb.append("-u ").append(req.getUsername().trim()).append(" ");
+                } else {
+                    sb.append("-u root ");
+                }
 
-                if (req.getPassword() != null && !req.getPassword().isBlank()) sb.append("-p'").append(req.getPassword()).append("' ");
-                if (req.getPort() != null) sb.append("-P ").append(req.getPort()).append(" ");
-                if (req.getDatabaseName() != null && !req.getDatabaseName().isBlank()) sb.append("-D ").append(req.getDatabaseName()).append(" ");
+                if (req.getPassword() != null && !req.getPassword().isBlank()) {
+                    String safePwd = req.getPassword().replace("'", "'\\''");
+                    sb.append("-p'").append(safePwd).append("' ");
+                }
+                if (req.getPort() != null) {
+                    sb.append("-P ").append(req.getPort()).append(" ");
+                }
+                if (req.getDatabaseName() != null && !req.getDatabaseName().isBlank()) {
+                    sb.append("-D ").append(req.getDatabaseName().trim()).append(" ");
+                }
 
-                sb.append("--batch --raw -e \"").append(safeQuery).append("\"");
+                // Batch, tab-delimited, unescaped raw output; statements read from stdin
+                sb.append("--batch --raw");
                 return sb.toString();
             }
             case "POSTGRES": {
                 StringBuilder sb = new StringBuilder();
                 if (req.getPassword() != null && !req.getPassword().isBlank()) {
-                    sb.append("PGPASSWORD='").append(req.getPassword()).append("' ");
+                    String safePwd = req.getPassword().replace("'", "'\\''");
+                    sb.append("PGPASSWORD='").append(safePwd).append("' ");
                 }
                 sb.append("psql ");
-                if (req.getUsername() != null && !req.getUsername().isBlank()) sb.append("-U ").append(req.getUsername()).append(" ");
-                else sb.append("-U postgres ");
+                if (req.getUsername() != null && !req.getUsername().isBlank()) {
+                    sb.append("-U ").append(req.getUsername().trim()).append(" ");
+                } else {
+                    sb.append("-U postgres ");
+                }
 
-                if (req.getPort() != null) sb.append("-p ").append(req.getPort()).append(" ");
-                if (req.getDatabaseName() != null && !req.getDatabaseName().isBlank()) sb.append("-d ").append(req.getDatabaseName()).append(" ");
+                if (req.getPort() != null) {
+                    sb.append("-p ").append(req.getPort()).append(" ");
+                }
+                if (req.getDatabaseName() != null && !req.getDatabaseName().isBlank()) {
+                    sb.append("-d ").append(req.getDatabaseName().trim()).append(" ");
+                }
 
-                sb.append("-c \"").append(safeQuery).append("\"");
+                // Read SQL statements from stdin
+                sb.append("-f -");
                 return sb.toString();
             }
             case "REDIS": {
                 StringBuilder sb = new StringBuilder("redis-cli ");
-                if (req.getPort() != null) sb.append("-p ").append(req.getPort()).append(" ");
-                if (req.getPassword() != null && !req.getPassword().isBlank()) sb.append("-a '").append(req.getPassword()).append("' ");
-                sb.append(req.getQuery());
+                if (req.getPort() != null) {
+                    sb.append("-p ").append(req.getPort()).append(" ");
+                }
+                if (req.getPassword() != null && !req.getPassword().isBlank()) {
+                    String safePwd = req.getPassword().replace("'", "'\\''");
+                    sb.append("-a '").append(safePwd).append("' ");
+                }
+                // redis-cli reads commands from stdin
                 return sb.toString();
             }
             default:
-                return req.getQuery();
+                throw new IllegalArgumentException("Unsupported database service type: " + req.getServiceType());
         }
     }
 

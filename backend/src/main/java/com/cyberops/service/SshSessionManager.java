@@ -70,8 +70,14 @@ public class SshSessionManager {
     }
 
     public boolean isAuthorized(String sessionId, Long userId) {
+        if (sessionId == null || userId == null) return false;
         ActiveSshSession session = activeSessions.get(sessionId);
-        return session != null && session.getUserId().equals(userId);
+        if (session != null) {
+            return userId.equals(session.getUserId());
+        }
+        return sessionRecordRepository.findById(sessionId)
+                .map(r -> userId.equals(r.getUserId()))
+                .orElse(false);
     }
 
     public synchronized void attachWebSocket(String sessionId, WebSocketSession wsSession) throws Exception {
