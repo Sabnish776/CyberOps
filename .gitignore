@@ -20,3 +20,6 @@ nohup.out
 *.iml
 .vscode/
 .antigravity-ide/
+.agents
+.gemini
+skills
