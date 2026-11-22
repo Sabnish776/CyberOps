@@ -182,4 +182,54 @@ public class SecurityHardeningTest {
                 serviceManagerService.executeAction(1L, 10L, badSudoReq));
         assertTrue(ex.getMessage().contains("newline or null characters not permitted"));
     }
+
+    @Test
+    @DisplayName("RateLimiterService enforces sliding window limits and resets")
+    void testRateLimiterService() {
+        com.cyberops.security.RateLimiterService limiter = new com.cyberops.security.RateLimiterService();
+        String key = "test:127.0.0.1";
+
+        // 3 requests allowed in 1000ms window
+        assertTrue(limiter.isAllowed(key, 3, 1000L));
+        assertTrue(limiter.isAllowed(key, 3, 1000L));
+        assertTrue(limiter.isAllowed(key, 3, 1000L));
+
+        // 4th request rejected
+        assertFalse(limiter.isAllowed(key, 3, 1000L));
+
+        // Reset clears entries
+        limiter.reset();
+        assertTrue(limiter.isAllowed(key, 3, 1000L));
+    }
+
+    @Test
+    @DisplayName("RateLimitingFilter returns 429 Too Many Requests after 5 login attempts")
+    void testRateLimitingFilter() throws Exception {
+        com.cyberops.security.RateLimiterService limiter = new com.cyberops.security.RateLimiterService();
+        com.cyberops.security.RateLimitingFilter filter = new com.cyberops.security.RateLimitingFilter(limiter);
+
+        jakarta.servlet.http.HttpServletRequest req = mock(jakarta.servlet.http.HttpServletRequest.class);
+        jakarta.servlet.http.HttpServletResponse res = mock(jakarta.servlet.http.HttpServletResponse.class);
+        jakarta.servlet.FilterChain chain = mock(jakarta.servlet.FilterChain.class);
+        java.io.StringWriter sw = new java.io.StringWriter();
+        java.io.PrintWriter pw = new java.io.PrintWriter(sw);
+
+        when(req.getRequestURI()).thenReturn("/api/auth/login");
+        when(req.getMethod()).thenReturn("POST");
+        when(req.getRemoteAddr()).thenReturn("192.168.1.100");
+        when(res.getWriter()).thenReturn(pw);
+
+        // 5 allowed attempts
+        for (int i = 0; i < 5; i++) {
+            filter.doFilter(req, res, chain);
+        }
+        verify(chain, times(5)).doFilter(req, res);
+
+        // 6th attempt should trigger 429 and NOT proceed to chain
+        filter.doFilter(req, res, chain);
+        verify(chain, times(5)).doFilter(req, res); // not called 6th time
+        verify(res).setStatus(429);
+        verify(res).setHeader("Retry-After", "60");
+        assertTrue(sw.toString().contains("Too many login attempts"));
+    }
 }
