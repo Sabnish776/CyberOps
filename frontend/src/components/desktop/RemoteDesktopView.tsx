@@ -38,6 +38,7 @@ export const RemoteDesktopView = forwardRef<RemoteDesktopViewRef, RemoteDesktopV
   const [isMacServer, setIsMacServer] = useState(false);
   const isMacServerRef = useRef(false);
   const hasSecurityFailureRef = useRef(false);
+  const currentSessionIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     setVncUsername(server.username || '');
@@ -90,6 +91,11 @@ export const RemoteDesktopView = forwardRef<RemoteDesktopViewRef, RemoteDesktopV
       } catch (e) {}
       rfbRef.current = null;
     }
+    const sid = currentSessionIdRef.current;
+    currentSessionIdRef.current = null;
+    if (sid) {
+      api.sessions.terminate(sid).catch(() => {});
+    }
     if (connecting || isConnected) {
        reportState('disconnected');
     }
@@ -110,6 +116,7 @@ export const RemoteDesktopView = forwardRef<RemoteDesktopViewRef, RemoteDesktopV
     try {
       const response = await api.servers.connect(server.id);
       const sessionId = response.sessionId;
+      currentSessionIdRef.current = sessionId;
 
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       let host = window.location.host;

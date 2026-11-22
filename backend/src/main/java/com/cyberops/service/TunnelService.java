@@ -157,6 +157,13 @@ public class TunnelService {
         tunnelRepository.deleteById(tunnelId);
     }
 
+    public void cleanupTunnelsForServer(Long serverId, Long userId) {
+        List<ServiceTunnel> tunnels = tunnelRepository.findByUserIdAndServerId(userId, serverId);
+        for (ServiceTunnel tunnel : tunnels) {
+            deleteTunnel(tunnel.getId(), userId);
+        }
+    }
+
     public boolean isTunnelActive(Long tunnelId) {
         return activeTunnels.containsKey(tunnelId);
     }

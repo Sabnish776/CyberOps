@@ -34,6 +34,7 @@ public class ServerController {
     private final EncryptionService encryptionService;
     private final SshClientService sshClientService;
     private final SshSessionManager sshSessionManager;
+    private final TunnelService tunnelService;
     private final AuditService auditService;
 
     @GetMapping
@@ -191,11 +192,11 @@ public class ServerController {
         ServerProfile server = serverRepository.findByIdAndUserId(id, principal.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Server not found"));
 
-        // Terminate any active sessions for this server first (FR-006)
-        List<SessionRecord> activeSessions = sessionRecordRepository.findByServerIdAndStatus(id, "ACTIVE");
-        for (SessionRecord session : activeSessions) {
-            sshSessionManager.cleanupSession(session.getId(), "CLOSED");
-        }
+        // 1. Terminate all active sessions (shell, VNC, connecting) for this server (FR-006)
+        sshSessionManager.terminateSessionsForServer(id);
+
+        // 2. Stop and remove all service tunnels tied to this server
+        tunnelService.cleanupTunnelsForServer(id, principal.getId());
 
         if (server.getCredentialId() != null) {
             credentialRepository.deleteByIdAndUserId(server.getCredentialId(), principal.getId());

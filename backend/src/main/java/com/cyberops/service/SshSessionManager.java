@@ -19,6 +19,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -37,6 +38,9 @@ public class SshSessionManager {
     @org.springframework.beans.factory.annotation.Value("${app.ssh.channel-open-timeout-ms:30000}")
     private long channelOpenTimeoutMs;
 
+    @org.springframework.beans.factory.annotation.Value("${app.ssh.detached-timeout-ms:600000}")
+    private long detachedTimeoutMs;
+
     @Getter
     @Setter
     public static class ActiveSshSession {
@@ -51,6 +55,8 @@ public class SshSessionManager {
         private WebSocketSession wsSession;
         private Future<?> readTask;
         private volatile boolean open = true;
+        private volatile Long detachedAt;
+        private volatile long lastActivityAt = System.currentTimeMillis();
     }
 
     public ActiveSshSession registerSession(String sessionId, Long userId, Long serverId, String serverName, ClientSession clientSession) {
@@ -87,6 +93,8 @@ public class SshSessionManager {
         }
 
         session.setWsSession(wsSession);
+        session.setDetachedAt(null);
+        session.setLastActivityAt(System.currentTimeMillis());
 
         // Open PTY Shell Channel if not already opened
         if (session.getShellChannel() == null || !session.getShellChannel().isOpen()) {
@@ -139,6 +147,7 @@ public class SshSessionManager {
         ActiveSshSession session = activeSessions.get(sessionId);
         if (session != null && session.getWsSession() == wsSession) {
             session.setWsSession(null);
+            session.setDetachedAt(System.currentTimeMillis());
             log.info("Detached WebSocket from session: {}", sessionId);
         }
     }
@@ -146,6 +155,7 @@ public class SshSessionManager {
     public void handleInput(String sessionId, String data) {
         ActiveSshSession session = activeSessions.get(sessionId);
         if (session != null && session.getRemoteIn() != null && session.isOpen()) {
+            session.setLastActivityAt(System.currentTimeMillis());
             try {
                 session.getRemoteIn().write(data.getBytes(StandardCharsets.UTF_8));
                 session.getRemoteIn().flush();
@@ -258,5 +268,59 @@ public class SshSessionManager {
         } catch (IOException e) {
             log.warn("Failed to send WebSocket message: {}", e.getMessage());
         }
+    }
+
+    @org.springframework.scheduling.annotation.Scheduled(fixedRate = 60000)
+    public void reapOrphanedSessions() {
+        long now = System.currentTimeMillis();
+        for (ActiveSshSession session : activeSessions.values()) {
+            String sid = session.getSessionId();
+            // Case 1: WebSocket detached longer than timeout (orphaned tab/window)
+            if (session.getWsSession() == null && session.getDetachedAt() != null) {
+                if (now - session.getDetachedAt() > detachedTimeoutMs) {
+                    log.warn("Reaping orphaned detached SSH session {} (detached for {}s)", sid, (now - session.getDetachedAt()) / 1000);
+                    cleanupSession(sid, "DISCONNECTED");
+                    continue;
+                }
+            }
+            // Case 2: Underlying SSH client session terminated or closed from server side
+            if (session.getClientSession() == null || !session.getClientSession().isOpen()) {
+                log.info("Cleaning up dead SSH session {} (ClientSession is closed)", sid);
+                cleanupSession(sid, "CLOSED");
+            }
+        }
+    }
+
+    @jakarta.annotation.PreDestroy
+    public void cleanupAll() {
+        log.info("Shutting down SshSessionManager: closing all {} active SSH sessions...", activeSessions.size());
+        for (String sessionId : new java.util.HashSet<>(activeSessions.keySet())) {
+            try {
+                cleanupSession(sessionId, "CLOSED");
+            } catch (Exception ignored) {}
+        }
+        ioExecutor.shutdownNow();
+    }
+
+    public void terminateSessionsForServer(Long serverId) {
+        if (serverId == null) return;
+        for (ActiveSshSession session : new java.util.ArrayList<>(activeSessions.values())) {
+            if (serverId.equals(session.getServerId())) {
+                log.info("Terminating active session {} for server {}", session.getSessionId(), serverId);
+                cleanupSession(session.getSessionId(), "CLOSED");
+            }
+        }
+        List<SessionRecord> records = sessionRecordRepository.findByServerId(serverId);
+        for (SessionRecord record : records) {
+            if (!"CLOSED".equalsIgnoreCase(record.getStatus()) && !"DISCONNECTED".equalsIgnoreCase(record.getStatus())) {
+                record.setStatus("CLOSED");
+                record.setDisconnectedAt(OffsetDateTime.now());
+                sessionRecordRepository.save(record);
+            }
+        }
+    }
+
+    public Map<String, ActiveSshSession> getActiveSessions() {
+        return activeSessions;
     }
 }

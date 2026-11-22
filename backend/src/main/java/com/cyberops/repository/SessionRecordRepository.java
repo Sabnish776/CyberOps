@@ -12,4 +12,5 @@ public interface SessionRecordRepository extends JpaRepository<SessionRecord, St
     List<SessionRecord> findByUserIdOrderByCreatedAtDesc(Long userId);
     Optional<SessionRecord> findByIdAndUserId(String id, Long userId);
     List<SessionRecord> findByServerIdAndStatus(Long serverId, String status);
+    List<SessionRecord> findByServerId(Long serverId);
 }

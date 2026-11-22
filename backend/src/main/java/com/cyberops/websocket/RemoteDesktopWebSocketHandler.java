@@ -34,6 +34,7 @@ public class RemoteDesktopWebSocketHandler extends BinaryWebSocketHandler implem
 
     private final ConcurrentHashMap<String, ChannelDirectTcpip> activeChannels = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, OutputStream> channelOuts = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, String> wsToSshSessionMap = new ConcurrentHashMap<>();
 
     @Override
     public List<String> getSubProtocols() {
@@ -126,6 +127,7 @@ public class RemoteDesktopWebSocketHandler extends BinaryWebSocketHandler implem
             
             activeChannels.put(session.getId(), finalChannel);
             channelOuts.put(session.getId(), finalOut);
+            wsToSshSessionMap.put(session.getId(), sessionId);
             
             ioExecutor.submit(() -> {
                 try {
@@ -156,6 +158,8 @@ public class RemoteDesktopWebSocketHandler extends BinaryWebSocketHandler implem
             log.info("VNC Desktop connected over SSH for session {}", sessionId);
         } catch (Exception e) {
             log.error("Failed to establish VNC port forward for session {}: {}", sessionId, e.getMessage());
+            wsToSshSessionMap.remove(session.getId());
+            sshSessionManager.cleanupSession(sessionId, "CLOSED");
             session.close(CloseStatus.SERVER_ERROR);
         }
     }
@@ -189,6 +193,11 @@ public class RemoteDesktopWebSocketHandler extends BinaryWebSocketHandler implem
             try {
                 channel.close(false);
             } catch (Exception ignored) {}
+        }
+        String sshSessionId = wsToSshSessionMap.remove(wsSessionId);
+        if (sshSessionId != null) {
+            log.info("Closing underlying SSH session {} on VNC WebSocket disconnect: {}", sshSessionId, wsSessionId);
+            sshSessionManager.cleanupSession(sshSessionId, "CLOSED");
         }
     }
 

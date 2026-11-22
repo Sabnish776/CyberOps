@@ -281,4 +281,86 @@ public class SecurityHardeningTest {
         assertTrue(blacklistService.isBlacklisted(token));
         assertFalse(util.validateToken(token));
     }
+
+    @Test
+    @DisplayName("RemoteDesktopWebSocketHandler closes underlying SSH session on WebSocket disconnect")
+    void testRemoteDesktopWebSocketHandlerCleansUpSshSession() throws Exception {
+        com.cyberops.websocket.RemoteDesktopWebSocketHandler handler =
+                new com.cyberops.websocket.RemoteDesktopWebSocketHandler(sshSessionManager);
+
+        org.springframework.web.socket.WebSocketSession wsSession = mock(org.springframework.web.socket.WebSocketSession.class);
+        when(wsSession.getId()).thenReturn("ws-rd-999");
+
+        // Simulate internal mapping: ws-rd-999 -> ssh-sess-999
+        java.util.concurrent.ConcurrentHashMap<String, String> map =
+                (java.util.concurrent.ConcurrentHashMap<String, String>) org.springframework.test.util.ReflectionTestUtils.getField(handler, "wsToSshSessionMap");
+        assertNotNull(map);
+        map.put("ws-rd-999", "ssh-sess-999");
+
+        // Act: WebSocket closes
+        handler.afterConnectionClosed(wsSession, org.springframework.web.socket.CloseStatus.NORMAL);
+
+        // Verify: underlying SSH session is explicitly cleaned up
+        verify(sshSessionManager).cleanupSession("ssh-sess-999", "CLOSED");
+        assertFalse(map.containsKey("ws-rd-999"));
+    }
+
+    @Test
+    @DisplayName("SshSessionManager reaps orphaned detached sessions past timeout")
+    void testSshSessionManagerReapsOrphanedSessions() {
+        com.cyberops.repository.SessionRecordRepository sessionRepo = mock(com.cyberops.repository.SessionRecordRepository.class);
+        com.cyberops.service.AuditService audit = mock(com.cyberops.service.AuditService.class);
+        SshSessionManager manager = new SshSessionManager(sessionRepo, audit);
+
+        org.springframework.test.util.ReflectionTestUtils.setField(manager, "detachedTimeoutMs", 500L); // 500ms timeout
+
+        org.apache.sshd.client.session.ClientSession clientSession = mock(org.apache.sshd.client.session.ClientSession.class);
+        when(clientSession.isOpen()).thenReturn(true);
+
+        SshSessionManager.ActiveSshSession session = manager.registerSession("sess-reap-1", 1L, 10L, "srv1", clientSession);
+        // Simulate detached WebSocket 2000ms ago
+        session.setWsSession(null);
+        session.setDetachedAt(System.currentTimeMillis() - 2000L);
+
+        // Verify session is active
+        assertNotNull(manager.getSession("sess-reap-1"));
+
+        // Trigger reaper
+        manager.reapOrphanedSessions();
+
+        // Verify session was cleaned up and closed
+        assertNull(manager.getSession("sess-reap-1"));
+        verify(clientSession).close(false);
+    }
+
+    @Test
+    @DisplayName("SshSessionManager.terminateSessionsForServer cleans up in-memory sessions and DB records")
+    void testSshSessionManagerTerminateSessionsForServer() {
+        com.cyberops.repository.SessionRecordRepository sessionRepo = mock(com.cyberops.repository.SessionRecordRepository.class);
+        com.cyberops.service.AuditService audit = mock(com.cyberops.service.AuditService.class);
+        SshSessionManager manager = new SshSessionManager(sessionRepo, audit);
+
+        org.apache.sshd.client.session.ClientSession client1 = mock(org.apache.sshd.client.session.ClientSession.class);
+        org.apache.sshd.client.session.ClientSession client2 = mock(org.apache.sshd.client.session.ClientSession.class);
+
+        manager.registerSession("sess-srv-1", 1L, 100L, "srv100", client1);
+        manager.registerSession("sess-srv-2", 1L, 200L, "srv200", client2);
+
+        com.cyberops.model.SessionRecord dbRecord = com.cyberops.model.SessionRecord.builder()
+                .id("db-sess-1")
+                .serverId(100L)
+                .status("CONNECTING")
+                .build();
+        when(sessionRepo.findByServerId(100L)).thenReturn(java.util.List.of(dbRecord));
+
+        // Terminate all sessions for server 100
+        manager.terminateSessionsForServer(100L);
+
+        // Server 100 session terminated, server 200 session still intact
+        assertNull(manager.getSession("sess-srv-1"));
+        assertNotNull(manager.getSession("sess-srv-2"));
+
+        assertEquals("CLOSED", dbRecord.getStatus());
+        verify(sessionRepo).save(dbRecord);
+    }
 }
