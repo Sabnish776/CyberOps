@@ -232,4 +232,30 @@ public class SecurityHardeningTest {
         verify(res).setHeader("Retry-After", "60");
         assertTrue(sw.toString().contains("Too many login attempts"));
     }
+
+    @Test
+    @DisplayName("JwtUtil throws fatal exception in production when default JWT secret is used")
+    void testJwtUtilThrowsInProductionWithDefaultSecret() {
+        JwtUtil util = new JwtUtil();
+        org.springframework.mock.env.MockEnvironment env = new org.springframework.mock.env.MockEnvironment();
+        env.setActiveProfiles("prod");
+        org.springframework.test.util.ReflectionTestUtils.setField(util, "environment", env);
+        org.springframework.test.util.ReflectionTestUtils.setField(util, "jwtSecretString", JwtUtil.DEFAULT_JWT_SECRET);
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class, util::validateSecretConfiguration);
+        assertTrue(ex.getMessage().contains("Running in production with default fallback JWT_SECRET is prohibited"));
+    }
+
+    @Test
+    @DisplayName("EncryptionService throws fatal exception in production when default master key is used")
+    void testEncryptionServiceThrowsInProductionWithDefaultKey() {
+        EncryptionService enc = new EncryptionService();
+        org.springframework.mock.env.MockEnvironment env = new org.springframework.mock.env.MockEnvironment();
+        env.setActiveProfiles("production");
+        org.springframework.test.util.ReflectionTestUtils.setField(enc, "environment", env);
+        org.springframework.test.util.ReflectionTestUtils.setField(enc, "masterKeyString", EncryptionService.DEFAULT_MASTER_KEY);
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class, enc::validateKeyConfiguration);
+        assertTrue(ex.getMessage().contains("Running in production with default fallback APP_MASTER_KEY is prohibited"));
+    }
 }

@@ -1,7 +1,10 @@
 package com.cyberops.service;
 
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
@@ -12,6 +15,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Base64;
 
 /**
@@ -19,7 +23,10 @@ import java.util.Base64;
  * Protects SSH passwords, private keys, and passphrases.
  */
 @Service
+@Slf4j
 public class EncryptionService {
+
+    public static final String DEFAULT_MASTER_KEY = "CyberOpsMasterEncKey202632B!";
 
     private static final String ALGORITHM = "AES/GCM/NoPadding";
     private static final int IV_LENGTH_BYTES = 12;
@@ -28,11 +35,15 @@ public class EncryptionService {
     @Value("${app.security.master-key:CyberOpsMasterEncKey202632B!}")
     private String masterKeyString;
 
+    @Autowired(required = false)
+    private Environment environment;
+
     private SecretKey secretKey;
     private final SecureRandom secureRandom = new SecureRandom();
 
     @PostConstruct
     public void init() {
+        validateKeyConfiguration();
         try {
             // Derive a 256-bit (32 bytes) key from the configured master key string using SHA-256
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -41,6 +52,38 @@ public class EncryptionService {
         } catch (Exception e) {
             throw new IllegalStateException("Failed to initialize encryption key", e);
         }
+    }
+
+    public void validateKeyConfiguration() {
+        boolean isDefault = DEFAULT_MASTER_KEY.equals(masterKeyString);
+        boolean isProduction = isProductionEnvironment();
+
+        if (isDefault) {
+            if (isProduction) {
+                throw new IllegalStateException(
+                        "CRITICAL SECURITY FATAL: Running in production with default fallback APP_MASTER_KEY is prohibited. " +
+                        "Please provide a secure, unique 32-byte APP_MASTER_KEY environment variable."
+                );
+            } else {
+                log.warn("\n" +
+                        "********************************************************************************\n" +
+                        "* [SECURITY NOTICE] Active APP_MASTER_KEY is using the default public fallback. *\n" +
+                        "* Set the 'APP_MASTER_KEY' environment variable before deploying to production! *\n" +
+                        "********************************************************************************"
+                );
+            }
+        }
+    }
+
+    private boolean isProductionEnvironment() {
+        if (environment == null) return false;
+        String[] profiles = environment.getActiveProfiles();
+        return Arrays.stream(profiles)
+                .anyMatch(p -> p.equalsIgnoreCase("prod") || p.equalsIgnoreCase("production"));
+    }
+
+    public boolean isUsingDefaultKey() {
+        return DEFAULT_MASTER_KEY.equals(masterKeyString);
     }
 
     /**
