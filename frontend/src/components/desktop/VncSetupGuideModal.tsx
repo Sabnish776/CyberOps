@@ -303,7 +303,7 @@ Remove-Item "tightvnc.msi"`}
                 <div>
                   <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--text-primary)', fontSize: '1.1rem' }}>Apple macOS</h3>
                   <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: '1.5' }}>
-                    macOS comes with a built-in VNC server! It is perfectly compatible with the CyberOps Command Center without needing to download anything.
+                    macOS comes with a built-in Screen Sharing / VNC server that is fully supported by the CyberOps Command Center without needing to install extra software.
                   </p>
                 </div>
               </div>
@@ -326,18 +326,17 @@ Remove-Item "tightvnc.msi"`}
                 }}>
                   <li>Open <strong style={{ color: 'var(--accent-cyan)' }}>System Settings</strong> (or System Preferences).</li>
                   <li>Go to <strong style={{ color: 'var(--accent-cyan)' }}>General &gt; Sharing</strong>.</li>
-                  <li>Turn on <strong style={{ color: 'var(--accent-cyan)' }}>Screen Sharing</strong>.</li>
+                  <li>Toggle on <strong style={{ color: 'var(--accent-cyan)' }}>Screen Sharing</strong>.</li>
                   <li>Click the <strong>( i )</strong> info icon next to Screen Sharing.</li>
-                  <li>Click <strong style={{ color: 'var(--accent-cyan)' }}>Computer Settings...</strong></li>
-                  <li>Check the box for <strong>"VNC viewers may control screen with password"</strong> and enter a simple password (e.g., <code style={{ background: 'var(--bg-card)', padding: '2px 6px', borderRadius: '4px' }}>1234</code>).</li>
-                  <li>Click OK and ensure Screen Sharing is active. It automatically listens on port 5900.</li>
+                  <li>Under <strong style={{ color: 'var(--accent-cyan)' }}>Allow access for</strong>, ensure your Mac user account (or "All users") is selected.</li>
+                  <li>Click <strong style={{ color: 'var(--accent-cyan)' }}>Done</strong>. macOS Screen Sharing is now actively listening on port 5900.</li>
                 </ol>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '1rem', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '8px' }}>
                 <Info size={20} color="var(--accent-cyan)" style={{ flexShrink: 0, marginTop: '2px' }} />
                 <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                  <strong style={{ color: 'var(--text-primary)' }}>Note:</strong> macOS requires VNC authentication by default. You will be prompted to enter this password when connecting through CyberOps.
+                  <strong style={{ color: 'var(--text-primary)' }}>macOS Authentication (ARD):</strong> macOS Screen Sharing uses native Apple Remote Desktop (ARD) authentication. When connecting, CyberOps prompts for your <strong>macOS Account Username and Password</strong> (the credentials you use to log into your Mac).
                 </div>
               </div>
             </div>

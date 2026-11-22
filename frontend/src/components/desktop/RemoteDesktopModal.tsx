@@ -152,7 +152,7 @@ export const RemoteDesktopModal: React.FC<RemoteDesktopModalProps> = ({
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
             <AlertCircle size={18} color="var(--accent-red)" style={{ flexShrink: 0, marginTop: '2px' }} />
             <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-              <strong style={{ color: 'var(--text-primary)' }}>Notice:</strong> The GUI mode requires your Linux server to have a Desktop Environment (e.g., XFCE4) and a VNC server (e.g., x11vnc) running on port 5900. If the connection fails, please ensure they are installed and running.
+              <strong style={{ color: 'var(--text-primary)' }}>Notice:</strong> The GUI mode connects via port 5900 over SSH. Ensure your remote system has a desktop environment and VNC/Screen Sharing active (Linux: XFCE/TigerVNC, Windows: TightVNC, macOS: Screen Sharing).
             </div>
           </div>
           <button 
