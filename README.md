@@ -36,6 +36,7 @@
 
 ---
 
+<a id="core-features"></a><a id="-core-features"></a>
 ## ✨ Core Features
 
 | Feature | Description |
@@ -54,6 +55,7 @@
 
 ---
 
+<a id="system-architecture"></a><a id="-system-architecture"></a>
 ## 🏗️ System Architecture
 
 ```mermaid
@@ -66,46 +68,46 @@ flowchart TD
     classDef storage fill:#0f172a,stroke:#fbbf24,stroke-width:2px,color:#f8fafc;
     classDef remote fill:#090d16,stroke:#a855f7,stroke-width:2px,color:#f8fafc;
 
-    subgraph CLIENT["🖥️ Browser Cockpit (React 18 + TypeScript + Vite)"]
-        UI_DASH["Dashboard & Server Cards\nGroup / Tag Filters • Latency Telemetry"]:::client
-        UI_TERM["Multi-Tab Persistent Terminal\nxterm.js • 0ms Local Line Buffer • ANSI Colors"]:::client
-        UI_BCAST["Cluster Broadcast Console\nParallel Multi-Exec • Tiled Matrix • Fleet Table"]:::client
-        UI_SAFETY["Security Challenge Modal\nClient-Side Interceptor • Re-Auth Prompt"]:::security
-        UI_VNC["Remote Desktop Canvas\nNoVNC • Virtual Keyboard • ARD / Standard VNC"]:::client
-        UI_SVC["Service Orchestrator\nAutomated Probes • Docker / Daemons • CLI Presets"]:::client
-        UI_DB["Database & SFTP Viewers\nTabular SQL/Redis Grid • File Manager"]:::client
+    subgraph CLIENT["🖥️ Browser Cockpit (React 18 + Vite)"]
+        UI_DASH["Dashboard<br/>Servers & Tags"]:::client
+        UI_TERM["Terminal Console<br/>xterm.js & 0ms Exec"]:::client
+        UI_BCAST["Broadcast Console<br/>Multi-Server Shell"]:::client
+        UI_SAFETY["Security Challenge<br/>Re-Auth Guardrail"]:::security
+        UI_VNC["Remote Desktop<br/>NoVNC & ARD/VNC"]:::client
+        UI_SVC["Service Orchestrator<br/>Probes & Logs"]:::client
+        UI_DB["Database & Files<br/>SQL & SFTP Tree"]:::client
     end
 
-    subgraph PROTOCOLS["⚡ High-Performance Transport Layer"]
-        HTTP_API["HTTPS / REST APIs\nStateless JWT Bearer Auth"]:::gateway
-        WS_TERM["WebSocket: /ws/terminal/:sessionId\nFull-Duplex JSON PTY Streams"]:::gateway
-        WS_VNC["WebSocket: /ws/desktop/:sessionId\nBinary RFB Subprotocol Tunnel"]:::gateway
+    subgraph PROTOCOLS["⚡ Transport Layer"]
+        HTTP_API["HTTPS / REST APIs<br/>Stateless JWT Auth"]:::gateway
+        WS_TERM["WebSocket: /ws/terminal<br/>Full-Duplex PTY Stream"]:::gateway
+        WS_VNC["WebSocket: /ws/desktop<br/>Binary RFB VNC Tunnel"]:::gateway
     end
 
-    subgraph BACKEND["🛡️ Core Engine (Spring Boot 3 + Apache MINA SSHD)"]
-        AUTH_SVC["Spring Security & JWT\nUser Isolation • BCrypt Hasher"]:::core
-        GUARD_SVC["CommandSafetyService\n7-Hazard Category Pattern Inspector"]:::security
-        BCAST_SVC["BroadcastService\nParallel Async Engine (CompletableFuture)"]:::core
-        TERM_HANDLER["TerminalWebSocketHandler\nJSON Session Streamer & Dynamic Resize"]:::core
-        VNC_HANDLER["RemoteDesktopWebSocketHandler\nRFB Header Sniffer & DirectTcpip Tunnel"]:::core
-        SSH_MGR["SshSessionManager & Client\nApache MINA • TCP_NODELAY Pooling"]:::core
-        SVC_PROBE["ServiceManagerService\nNon-Destructive Composite Probe (~70ms)"]:::core
-        DB_TUNNEL["DatabaseService & TunnelService\nRemote SQL/Redis Pipe • Port Forwarding"]:::core
-        SFTP_SVC["SftpService\nStreamed File Transfers & Path Sanitizer"]:::core
-        VAULT["Credential Vault & AuditService\nAES-256-GCM Encryption • Secret Redaction"]:::storage
+    subgraph BACKEND["🛡️ Core Engine (Spring Boot 3 + MINA SSHD)"]
+        AUTH_SVC["Security & JWT<br/>User Isolation"]:::core
+        GUARD_SVC["CommandSafety<br/>7-Hazard Inspector"]:::security
+        BCAST_SVC["BroadcastService<br/>Parallel Async Exec"]:::core
+        TERM_HANDLER["TerminalHandler<br/>PTY Session Streamer"]:::core
+        VNC_HANDLER["RemoteDesktopHandler<br/>DirectTcpip Bridge"]:::core
+        SSH_MGR["SshSessionManager<br/>MINA Pool & Multiplex"]:::core
+        SVC_PROBE["ServiceProbe<br/>~70ms Composite Probe"]:::core
+        DB_TUNNEL["DB & Tunnels<br/>SQL Pipe & Port Forwards"]:::core
+        SFTP_SVC["SftpService<br/>Streamed Transfers"]:::core
+        VAULT["Credential Vault<br/>AES-256-GCM at Rest"]:::storage
     end
 
-    subgraph STORAGE["💾 Persistence Layer (Zero External Dependencies)"]
-        SQLITE[("Embedded SQLite DB\ncyberops.db\nProfiles • Tunnels • Encrypted Keys • Logs")]:::storage
+    subgraph STORAGE["💾 Persistence Layer"]
+        SQLITE[("Embedded SQLite<br/>cyberops.db")]:::storage
     end
 
-    subgraph FLEET["🌐 Target Infrastructure (Cross-Platform Fleet)"]
+    subgraph FLEET["🌐 Target Infrastructure"]
         direction TB
-        SSH_TARGETS["SSH Endpoints & DirectTcpip Bridges\nPorts: 22 (SSH) • 5900-5903 (VNC/ARD)"]:::remote
-        NODE_LINUX["🐧 Linux Servers (Systemd/OpenRC, Docker, TigerVNC)"]:::remote
-        NODE_MAC["🍎 macOS Nodes (Darwin PTY, screensharingd ARD/VNC)"]:::remote
-        NODE_WIN["🪟 Windows Targets (Windows OpenSSH, TightVNC Loopback)"]:::remote
-        NODE_MOBILE["📱 Android / Termux (OpenSSH, Termux X11)"]:::remote
+        SSH_TARGETS["SSH Endpoints<br/>Ports: 22 • 5900-5903"]:::remote
+        NODE_LINUX["🐧 Linux Servers<br/>Systemd • Docker • TigerVNC"]:::remote
+        NODE_MAC["🍎 macOS Nodes<br/>Darwin PTY • Screen Sharing"]:::remote
+        NODE_WIN["🪟 Windows Targets<br/>OpenSSH • TightVNC"]:::remote
+        NODE_MOBILE["📱 Android / Termux<br/>OpenSSH • Termux X11"]:::remote
 
         SSH_TARGETS --- NODE_LINUX
         SSH_TARGETS --- NODE_MAC
@@ -114,13 +116,13 @@ flowchart TD
     end
 
     %% Client to Transport
-    UI_DASH -->|REST Requests| HTTP_API
-    UI_SVC -->|REST Requests| HTTP_API
-    UI_DB -->|REST Requests| HTTP_API
-    UI_BCAST -->|Fleet Broadcast| HTTP_API
-    UI_BCAST -.->|Hazard Intercept Alert| UI_SAFETY
-    UI_TERM <-->|Full-Duplex I/O| WS_TERM
-    UI_VNC <-->|Binary RFB Stream| WS_VNC
+    UI_DASH -->|REST| HTTP_API
+    UI_SVC -->|REST| HTTP_API
+    UI_DB -->|REST| HTTP_API
+    UI_BCAST -->|Broadcast| HTTP_API
+    UI_BCAST -.->|Hazard Alert| UI_SAFETY
+    UI_TERM <-->|PTY Stream| WS_TERM
+    UI_VNC <-->|RFB Stream| WS_VNC
 
     %% Transport to Backend
     HTTP_API --> AUTH_SVC
@@ -133,8 +135,8 @@ flowchart TD
     WS_VNC <--> VNC_HANDLER
 
     %% Backend Internal Interactions
-    GUARD_SVC -->|Cryptographic Re-Auth Check| AUTH_SVC
-    GUARD_SVC -->|Authorized Fleet Dispatch| BCAST_SVC
+    GUARD_SVC -->|Verify| AUTH_SVC
+    GUARD_SVC -->|Dispatch| BCAST_SVC
     BCAST_SVC --> SSH_MGR
     TERM_HANDLER <--> SSH_MGR
     VNC_HANDLER <--> SSH_MGR
@@ -146,13 +148,14 @@ flowchart TD
     VAULT <--> SQLITE
 
     %% Backend to Target Fleet
-    SSH_MGR <-->|Interactive PTY & Remote Exec| SSH_TARGETS
-    SSH_MGR <-->|DirectTcpip Port Forwarding 5900-5903| SSH_TARGETS
-    SSH_MGR <-->|SFTP Subsystem Channel| SSH_TARGETS
+    SSH_MGR <-->|Interactive Shell| SSH_TARGETS
+    SSH_MGR <-->|Port Forward 5900-5903| SSH_TARGETS
+    SSH_MGR <-->|SFTP Subsystem| SSH_TARGETS
 ```
 
 ---
 
+<a id="universal-remote-desktop-vnc-over-ssh"></a><a id="-universal-remote-desktop-vnc-over-ssh"></a>
 ## 🖥️ Universal Remote Desktop (VNC over SSH)
 
 Access remote graphical desktops directly in your browser with **zero configuration**, **no open firewall ports**, and **no VPN required**. CyberOps tunnels the connection securely over your existing SSH session:
@@ -169,6 +172,7 @@ Access remote graphical desktops directly in your browser with **zero configurat
 
 ---
 
+<a id="security--safety-guardrails"></a><a id="-security--safety-guardrails"></a>
 ## 🛡️ Security & Safety Guardrails
 
 To prevent fleet-wide disasters and unauthorized tampering, commands pass through a **3-Tier Defense Engine**:
@@ -179,24 +183,25 @@ flowchart TD
     classDef hazard fill:#1c1017,stroke:#f43f5e,stroke-width:2px,color:#f8fafc;
     classDef safe fill:#0f172a,stroke:#10b981,stroke-width:2px,color:#f8fafc;
 
-    CMD["User Input / Cluster Broadcast Command"]:::input
-    T1{"Tier 1: Intelligent Pattern Inspector\n(Scans 7 High-Risk Hazard Categories)"}:::hazard
-    T2["Tier 2: Security Challenge Modal\n(Browser Guardrail: Blocks Outgoing Network Request)"]:::hazard
-    T3{"Tier 3: Cryptographic Backend Verification\n(Validates Password Hash via BCrypt in SQLite)"}:::hazard
-    EXEC["Parallel Remote Fleet Execution\n(Non-Blocking SSH ChannelExec Dispatch)"]:::safe
-    BLOCK["Execution Terminated & Audited\n(Logs: DESTRUCTIVE_EXEC_BLOCKED)"]:::hazard
+    CMD["User Shell Command"]:::input
+    T1{"Tier 1<br/>Hazard Scan"}:::hazard
+    T2["Tier 2: Guardrail Modal<br/>(Re-Auth Required)"]:::hazard
+    T3{"Tier 3<br/>Verify Hash"}:::hazard
+    EXEC["Parallel Execution<br/>(Fleet Dispatch)"]:::safe
+    BLOCK["Execution Blocked<br/>(Audit Logged)"]:::hazard
 
     CMD --> T1
-    T1 -->|No Hazard Detected| EXEC
-    T1 -->|Destructive Pattern Matched| T2
-    T2 -->|User Confirms Workspace Password| T3
-    T2 -->|Operation Cancelled| BLOCK
-    T3 -->|Valid Hash Match| EXEC
-    T3 -->|Invalid Password - 403 Forbidden| BLOCK
+    T1 -->|Clean| EXEC
+    T1 -->|Hazard| T2
+    T2 -->|Password Confirmed| T3
+    T2 -->|Cancelled| BLOCK
+    T3 -->|Valid Hash| EXEC
+    T3 -->|Invalid| BLOCK
 ```
 
 ---
 
+<a id="quick-start"></a><a id="-quick-start"></a>
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -376,6 +381,7 @@ CyberOps/
 
 ---
 
+<a id="rest--websocket-api-reference"></a><a id="api-reference"></a>
 <details>
 <summary><b>📡 REST & WebSocket API Reference</b></summary>
 
