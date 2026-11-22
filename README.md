@@ -16,7 +16,7 @@
   <b>Connect to remote servers, cloud VPS instances, local machines, or Docker containers with zero keystroke latency, embedded encrypted storage, and deep automated service discovery.</b>
 </p>
 
-[🚀 Quick Start](#-quick-start) • [✨ Core Features](#-core-features) • [🏗️ Architecture](#️-system-architecture) • [🖥️ Remote Desktop (VNC)](#️-universal-remote-desktop-vnc-over-ssh) • [🛡️ Security](#️-security--safety-guardrails) • [📚 API Reference](#-rest--websocket-api-reference)
+[🚀 Quick Start](#quick-start) • [✨ Core Features](#core-features) • [🏗️ Architecture](#system-architecture) • [🖥️ Remote Desktop (VNC)](#universal-remote-desktop-vnc-over-ssh) • [🛡️ Security](#security--safety-guardrails) • [📚 API Reference](#rest--websocket-api-reference)
 
 ---
 
@@ -78,8 +78,8 @@ flowchart TD
 
     subgraph PROTOCOLS["⚡ High-Performance Transport Layer"]
         HTTP_API["HTTPS / REST APIs\nStateless JWT Bearer Auth"]:::gateway
-        WS_TERM["WebSocket: /ws/terminal/{sessionId}\nFull-Duplex JSON PTY Streams"]:::gateway
-        WS_VNC["WebSocket: /ws/desktop/{sessionId}\nBinary RFB Subprotocol Tunnel"]:::gateway
+        WS_TERM["WebSocket: /ws/terminal/:sessionId\nFull-Duplex JSON PTY Streams"]:::gateway
+        WS_VNC["WebSocket: /ws/desktop/:sessionId\nBinary RFB Subprotocol Tunnel"]:::gateway
     end
 
     subgraph BACKEND["🛡️ Core Engine (Spring Boot 3 + Apache MINA SSHD)"]
@@ -192,7 +192,7 @@ flowchart TD
     T2 -->|User Confirms Workspace Password| T3
     T2 -->|Operation Cancelled| BLOCK
     T3 -->|Valid Hash Match| EXEC
-    T3 -->|Invalid Password (403 Forbidden)| BLOCK
+    T3 -->|Invalid Password - 403 Forbidden| BLOCK
 ```
 
 ---
@@ -424,7 +424,7 @@ CyberOps/
 
 ## 📜 License
 
-This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License**.
 
 <div align="center">
   <sub>Engineered with ⚡ for high-velocity DevOps, SysAdmins, and Security Operators.</sub>
