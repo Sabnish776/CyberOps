@@ -258,4 +258,27 @@ public class SecurityHardeningTest {
         IllegalStateException ex = assertThrows(IllegalStateException.class, enc::validateKeyConfiguration);
         assertTrue(ex.getMessage().contains("Running in production with default fallback APP_MASTER_KEY is prohibited"));
     }
+
+    @Test
+    @DisplayName("TokenBlacklistService invalidates JWT token upon logout")
+    void testTokenBlacklistServiceAndJwtInvalidation() {
+        JwtUtil util = new JwtUtil();
+        com.cyberops.security.TokenBlacklistService blacklistService = new com.cyberops.security.TokenBlacklistService();
+        org.springframework.test.util.ReflectionTestUtils.setField(util, "jwtSecretString", "MySuperSecretKeyForTestingJwt1234567890!");
+        org.springframework.test.util.ReflectionTestUtils.setField(util, "jwtExpirationMs", 3600000L);
+        org.springframework.test.util.ReflectionTestUtils.setField(util, "tokenBlacklistService", blacklistService);
+        util.init();
+
+        String token = util.generateToken(99L, "logout@test.com");
+        assertTrue(util.validateToken(token));
+        assertFalse(blacklistService.isBlacklisted(token));
+
+        // Blacklist the token
+        long expiry = util.getExpirationTimeFromToken(token);
+        blacklistService.blacklistToken(token, expiry);
+
+        // Verification: token is blacklisted and validateToken returns false
+        assertTrue(blacklistService.isBlacklisted(token));
+        assertFalse(util.validateToken(token));
+    }
 }

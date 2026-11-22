@@ -4,18 +4,22 @@ import com.cyberops.dto.AuthDtos.*;
 import com.cyberops.model.User;
 import com.cyberops.repository.UserRepository;
 import com.cyberops.security.JwtUtil;
+import com.cyberops.security.TokenBlacklistService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final TokenBlacklistService tokenBlacklistService;
     private final AuditService auditService;
 
     @Transactional
@@ -67,5 +71,21 @@ public class AuthService {
                         .email(user.getEmail())
                         .build())
                 .build();
+    }
+
+    public void logout(String token) {
+        if (token != null && !token.isBlank()) {
+            try {
+                long expirationTime = jwtUtil.getExpirationTimeFromToken(token);
+                Long userId = jwtUtil.getUserIdFromToken(token);
+                tokenBlacklistService.blacklistToken(token, expirationTime);
+                auditService.recordEvent(userId, null, "USER_LOGOUT", "SUCCESS", "User logged out; token invalidated");
+                log.info("Token blacklisted successfully for user id: {}", userId);
+            } catch (Exception e) {
+                // If token cannot be fully parsed, blacklist it anyway for 24h
+                tokenBlacklistService.blacklistToken(token, System.currentTimeMillis() + 86400000L);
+                log.warn("Token blacklisted with fallback expiry: {}", e.getMessage());
+            }
+        }
     }
 }

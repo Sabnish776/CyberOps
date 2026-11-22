@@ -32,6 +32,9 @@ public class JwtUtil {
     @Autowired(required = false)
     private Environment environment;
 
+    @Autowired(required = false)
+    private TokenBlacklistService tokenBlacklistService;
+
     private SecretKey signingKey;
 
     @PostConstruct
@@ -101,8 +104,16 @@ public class JwtUtil {
         return claims.get("email", String.class);
     }
 
+    public long getExpirationTimeFromToken(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims.getExpiration().getTime();
+    }
+
     public boolean validateToken(String token) {
         try {
+            if (tokenBlacklistService != null && tokenBlacklistService.isBlacklisted(token)) {
+                return false;
+            }
             Claims claims = extractAllClaims(token);
             return !claims.getExpiration().before(new Date());
         } catch (Exception e) {
