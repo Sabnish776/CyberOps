@@ -307,6 +307,9 @@ public class ServiceManagerService {
         }
 
         String safeServiceName = serviceName.replaceAll("[^a-zA-Z0-9_.-]", "");
+        if (safeServiceName.isBlank()) {
+            throw new IllegalArgumentException("Invalid service name");
+        }
         String safeSource = source != null ? source.toUpperCase() : "SYSTEMD";
 
         String logCmd;

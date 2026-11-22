@@ -156,8 +156,8 @@ public class SshSessionManager {
     }
 
     public void handleResize(String sessionId, int cols, int rows) {
-        if (cols < 20 || rows < 5) {
-            log.warn("Rejected invalid terminal resize for session {}: {}x{} (likely collapsed or hidden tab)", sessionId, cols, rows);
+        if (cols < 20 || rows < 5 || cols > 1000 || rows > 500) {
+            log.warn("Rejected invalid terminal resize for session {}: {}x{}", sessionId, cols, rows);
             return;
         }
 
