@@ -239,6 +239,20 @@ export const TunnelManagerModal: React.FC<TunnelManagerModalProps> = ({
             </div>
           )}
 
+          {window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && (
+            <div style={{
+              background: 'rgba(255, 170, 0, 0.08)',
+              border: '1px solid rgba(255, 170, 0, 0.25)',
+              borderRadius: '6px',
+              padding: '6px 12px',
+              fontSize: '0.78rem',
+              color: '#ffd080',
+              marginBottom: '1rem'
+            }}>
+              ℹ️ <strong>Cloud Note:</strong> Tunnels bind on the cloud backend host. For direct desktop database access on your personal PC, use a local SSH tunnel or the built-in Database workspace.
+            </div>
+          )}
+
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
               Forward isolated remote services (MySQL, PostgreSQL, Redis, APIs) securely to <code>127.0.0.1</code> on your local machine over SSH.

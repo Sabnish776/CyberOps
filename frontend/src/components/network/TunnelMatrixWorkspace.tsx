@@ -281,18 +281,33 @@ const TunnelMatrixInner: React.FC<TunnelMatrixWorkspaceProps> = ({ servers, isVi
       {/* HUD bar */}
       <div style={{
         position: 'absolute', top: 16, left: 16, zIndex: 10,
-        background: 'rgba(8,15,30,0.85)', backdropFilter: 'blur(8px)',
-        padding: '10px 18px', borderRadius: '10px',
-        border: '1px solid rgba(0,240,255,0.3)',
-        color: '#fff', display: 'flex', gap: '16px', alignItems: 'center',
-        fontSize: '0.82rem'
+        display: 'flex', flexDirection: 'column', gap: '8px'
       }}>
-        <span style={{ fontWeight: 700, color: 'var(--accent-cyan)', letterSpacing: '1px' }}>
-          TUNNEL MATRIX
-        </span>
-        <span style={{ opacity: 0.6, fontStyle: 'italic' }}>
-          Drag from Server ➜ Local Machine
-        </span>
+        <div style={{
+          background: 'rgba(8,15,30,0.85)', backdropFilter: 'blur(8px)',
+          padding: '10px 18px', borderRadius: '10px',
+          border: '1px solid rgba(0,240,255,0.3)',
+          color: '#fff', display: 'flex', gap: '16px', alignItems: 'center',
+          fontSize: '0.82rem'
+        }}>
+          <span style={{ fontWeight: 700, color: 'var(--accent-cyan)', letterSpacing: '1px' }}>
+            TUNNEL MATRIX
+          </span>
+          <span style={{ opacity: 0.6, fontStyle: 'italic' }}>
+            Drag from Server ➜ Local Machine
+          </span>
+        </div>
+
+        {window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && (
+          <div style={{
+            background: 'rgba(13, 20, 36, 0.9)', backdropFilter: 'blur(8px)',
+            padding: '6px 12px', borderRadius: '8px',
+            border: '1px solid rgba(255, 170, 0, 0.35)',
+            color: '#ffd080', fontSize: '0.74rem', maxWidth: '420px', lineHeight: 1.4
+          }}>
+            ℹ️ <strong>Cloud Note:</strong> Tunnels bind to the cloud backend. To connect local desktop tools (e.g. DBeaver) on your personal PC, use standard CLI tunnels or the built-in Database workspace.
+          </div>
+        )}
       </div>
 
       {nodes.length > 0 && (
