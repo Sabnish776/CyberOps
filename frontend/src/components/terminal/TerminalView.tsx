@@ -60,10 +60,16 @@ export const TerminalView: React.FC<TerminalViewProps> = ({
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     let host = window.location.host;
-    const meta = import.meta as any;
-    if (meta.env && meta.env.VITE_API_URL) {
-      const apiUrl = new URL(meta.env.VITE_API_URL);
-      host = apiUrl.host;
+    const envApiUrl = import.meta.env.VITE_API_URL;
+    if (envApiUrl) {
+      try {
+        let cleanUrl = String(envApiUrl).trim();
+        if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
+          cleanUrl = `https://${cleanUrl}`;
+        }
+        const apiUrl = new URL(cleanUrl);
+        host = apiUrl.host;
+      } catch (e) {}
     }
     const token = authStorage.getToken();
     const tokenParam = token ? `?token=${encodeURIComponent(token)}` : '';

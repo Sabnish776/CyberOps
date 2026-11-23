@@ -36,8 +36,13 @@ export const authStorage = {
 };
 
 const getBaseUrl = (): string => {
-  const meta = import.meta as any;
-  return meta.env?.VITE_API_URL ? meta.env.VITE_API_URL.replace(/\/$/, '') : '';
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (!envUrl) return '';
+  let url = String(envUrl).trim().replace(/\/$/, '');
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    url = `https://${url}`;
+  }
+  return url;
 };
 
 async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
