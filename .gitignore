@@ -23,3 +23,12 @@ nohup.out
 .agents
 .gemini
 skills
+
+# Environment & Secret Configurations
+.env
+.env.*
+*.env
+!.env.example
+!.env.properties.example
+**/application-local.yml
+**/application-local.properties

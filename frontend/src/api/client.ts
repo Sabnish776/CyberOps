@@ -35,6 +35,11 @@ export const authStorage = {
   setUser: (user: User) => localStorage.setItem(USER_KEY, JSON.stringify(user))
 };
 
+const getBaseUrl = (): string => {
+  const meta = import.meta as any;
+  return meta.env?.VITE_API_URL ? meta.env.VITE_API_URL.replace(/\/$/, '') : '';
+};
+
 async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = authStorage.getToken();
   const headers = new Headers(options.headers || {});
@@ -47,7 +52,9 @@ async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise
     headers.set('Content-Type', 'application/json');
   }
 
-  const response = await fetch(endpoint, {
+  const baseUrl = getBaseUrl();
+  const url = endpoint.startsWith('http') ? endpoint : `${baseUrl}${endpoint}`;
+  const response = await fetch(url, {
     ...options,
     headers
   });
@@ -160,7 +167,7 @@ export const api = {
       );
     },
     downloadUrl: (serverId: number, path: string) =>
-      `/api/servers/${serverId}/files/download?path=${encodeURIComponent(path)}`,
+      `${getBaseUrl()}/api/servers/${serverId}/files/download?path=${encodeURIComponent(path)}`,
     delete: async (serverId: number, path: string) =>
       apiFetch<{ message: string }>(
         `/api/servers/${serverId}/files?path=${encodeURIComponent(path)}`,
